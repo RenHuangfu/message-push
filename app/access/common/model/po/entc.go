@@ -11,11 +11,9 @@ import (
 )
 
 func main() {
-	pkgPath := "./ent"
-	if err != nil {
-	}
-
-	err = entc.Generate("./schema", &gen.Config{
+	target := "./ent"
+	pkgPath := "message-push/app/access/common/model/po/ent"
+	err := entc.Generate("./schema", &gen.Config{
 		Target:  target,
 		Package: pkgPath,
 		Features: []gen.Feature{

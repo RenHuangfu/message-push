@@ -7,14 +7,14 @@ import (
 	"service/internal/biz"
 )
 
-// GreeterService is a greeter service.
+// GreeterService is a greeter server.
 type GreeterService struct {
 	v1.UnimplementedGreeterServer
 
 	uc *biz.GreeterUsecase
 }
 
-// NewGreeterService new a greeter service.
+// NewGreeterService new a greeter server.
 func NewGreeterService(uc *biz.GreeterUsecase) *GreeterService {
 	return &GreeterService{uc: uc}
 }

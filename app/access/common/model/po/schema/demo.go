@@ -6,12 +6,12 @@ import (
 )
 
 // Test holds the schema definition for the Test entity.
-type Test struct {
+type Demo struct {
 	ent.Schema
 }
 
 // Fields of the Test.
-func (Test) Fields() []ent.Field {
+func (Demo) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("id").
 			Unique().
@@ -26,6 +26,6 @@ func (Test) Fields() []ent.Field {
 }
 
 // Edges of the Test.
-func (Test) Edges() []ent.Edge {
+func (Demo) Edges() []ent.Edge {
 	return nil
 }

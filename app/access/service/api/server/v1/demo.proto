@@ -4,24 +4,24 @@ package server.v1;
 
 import "google/api/annotations.proto";
 
-option go_package = "service/api/server/v1;v1";
+option go_package = "server/api/server/v1;v1";
 
 // The greeting service definition.
-service Greeter {
+service demo {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {
+  rpc DemoCreateName (DemoCreateNameRequest) returns (DemoCreateNameResponse) {
     option (google.api.http) = {
-      get: "/helloworld/{name}"
+      get: "/demo_create_name"
     };
   }
 }
 
 // The request message containing the user's name.
-message HelloRequest {
+message DemoCreateNameRequest {
   string name = 1;
 }
 
 // The response message containing the greetings
-message HelloReply {
+message DemoCreateNameResponse {
   string message = 1;
 }
