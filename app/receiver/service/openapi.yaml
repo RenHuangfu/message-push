@@ -1,0 +1,104 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Demo API
+    description: The greeting service definition.
+    version: 0.0.1
+paths:
+    /demo_create_name:
+        post:
+            tags:
+                - Demo
+            description: Sends a greeting
+            operationId: Demo_DemoCreateName
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/server.v1.DemoCreateNameRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/server.v1.DemoCreateNameResponse'
+    /demo_push:
+        post:
+            tags:
+                - Demo
+            operationId: Demo_DemoMessage
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/server.v1.DemoMessageRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/server.v1.DemoMessageResponse'
+    /demo_search_name:
+        post:
+            tags:
+                - Demo
+            operationId: Demo_DemoSearchName
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/server.v1.DemoSearchNameRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/server.v1.DemoSearchNameResponse'
+components:
+    schemas:
+        server.v1.DemoCreateNameRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+            description: The request message containing the user's name.
+        server.v1.DemoCreateNameResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+            description: The response message containing the greetings
+        server.v1.DemoMessageRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+        server.v1.DemoMessageResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+        server.v1.DemoSearchNameRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+        server.v1.DemoSearchNameResponse:
+            type: object
+            properties:
+                exist:
+                    type: boolean
+                name:
+                    type: string
+tags:
+    - name: Demo

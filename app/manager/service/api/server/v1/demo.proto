@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package server.v1;
+
+option go_package = "server/api/server/v1;v1";
+
+message DemoMessage {
+  string message = 1;
+}
+
+service demo {
+  rpc SendMessage (SendMessageRequest) returns (SendMessageResponse) ;
+}
+
+message SendMessageRequest{
+  string message = 1;
+}
+
+message SendMessageResponse{
+  string message = 1;
+}
+

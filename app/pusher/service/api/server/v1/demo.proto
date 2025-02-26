@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package server.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "server/api/server/v1;v1";
+
+// The greeting service definition.
+service demo {
+  rpc SendMessage (SendMessageRequest) returns (SendMessageResponse) ;
+
+  rpc StreamMessage (stream SendMessageRequest) returns (stream SendMessageResponse) ;
+}
+
+message SendMessageRequest{
+  string message = 1;
+}
+
+message SendMessageResponse{
+  string message = 1;
+}
