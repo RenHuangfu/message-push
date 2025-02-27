@@ -21,7 +21,7 @@ RUN go mod download
 COPY . .
 
 # 构建二进制文件（通过SERVICE_NAME动态指定路径）
-RUN CGO_ENABLED=0 GOOS=linux go build -o /${SERVICE_NAME}-service ./app/${SERVICE_NAME}/service/cmd/server
+RUN CGO_ENABLED=0 GOOS=linux go build -o /service ./app/${SERVICE_NAME}/service/cmd/server
 
 # 运行阶段
 FROM alpine:latest
@@ -39,7 +39,7 @@ ARG SERVICE_NAME
 COPY --from=builder /app/app/${SERVICE_NAME}/service/configs/config.yaml .
 
 # 复制可执行文件
-COPY --from=builder /${SERVICE_NAME}-service .
+COPY --from=builder /service .
 
 # 启动服务
-CMD ["./${SERVICE_NAME}-service", "-conf", "config.yaml"]
+CMD ["./service", "-conf", "config.yaml"]
