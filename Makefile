@@ -25,6 +25,7 @@ init:
 	go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 	go install github.com/google/wire/cmd/wire@latest
 
+### app/${server-name}/service ###
 .PHONY: config
 # generate internal proto
 config:
@@ -55,30 +56,42 @@ api:
 	       --openapi_out=fq_schema_naming=true,default_response=false:. \
 	       $(API_PROTO_FILES)
 
-.PHONY: build
-# build
-build:
-	docker build -f app/manager/Dockerfile -t manager-service:latest .
-	docker build -f app/pusher/Dockerfile -t pusher-service:latest .
-	docker build -f app/receiver/Dockerfile -t receiver-service:latest .
+### message-push/ ###
+.PHONY: build-all build-manager build-pusher build-receiver
+SERVICES := manager pusher receiver
+# 默认构建所有服务
+build-all: $(SERVICES)
+# 每个服务的独立构建目标
+$(SERVICES):
+	docker build \
+		-f deploy/Dockerfile \
+		--build-arg SERVICE_NAME=$@ \
+		-t $@-service:latest .
+build: build-all
+build-manager:
+	docker build -f deploy/Dockerfile --build-arg SERVICE_NAME=manager -t manager-service:latest .
+build-pusher:
+	docker build -f deploy/Dockerfile --build-arg SERVICE_NAME=pusher -t pusher-service:latest .
+build-receiver:
+	docker build -f deploy/Dockerfile --build-arg SERVICE_NAME=receiver -t receiver-service:latest .
 
 .PHONY: run
 # run
 run:
 	cd ./deploy && docker compose up -d
 
-.PHONY: generate
+#.PHONY: generate
 # generate
-generate:
-	go generate ./...
-	go mod tidy
+#generate:
+#	go generate ./...
+#	go mod tidy
 
-.PHONY: all
+#.PHONY: all
 # generate all
-all:
-	make api;
-	make config;
-	make generate;
+#all:
+#	make api;
+#	make config;
+#	make generate;
 
 # show help
 help:
