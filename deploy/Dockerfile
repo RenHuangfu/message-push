@@ -42,4 +42,4 @@ COPY --from=builder /app/app/${SERVICE_NAME}/service/configs/config.yaml .
 COPY --from=builder /service .
 
 # 启动服务
-CMD ["./service", "-conf", "../../configs/config.yaml"]
+CMD ["./service", "-conf", "config.yaml"]
