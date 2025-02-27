@@ -1,4 +1,4 @@
 /kafa-group.yml
-app/manager/service/configs/local.yaml
-app/pusher/service/configs/local.yaml
-app/receiver/service/configs/local.yaml
+/app/manager/service/configs/local.yaml
+/app/pusher/service/configs/local.yaml
+/app/receiver/service/configs/local.yaml
