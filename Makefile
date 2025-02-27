@@ -58,7 +58,14 @@ api:
 .PHONY: build
 # build
 build:
-	mkdir -p bin/ && go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/ ./...
+	docker build -f app/manager/Dockerfile -t manager-service:latest .
+	docker build -f app/pusher/Dockerfile -t pusher-service:latest .
+	docker build -f app/receiver/Dockerfile -t receiver-service:latest .
+
+.PHONY: run
+# run
+run:
+	cd ./deploy && docker compose up -d
 
 .PHONY: generate
 # generate
