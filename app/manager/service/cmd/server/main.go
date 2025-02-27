@@ -4,6 +4,7 @@ import (
 	"flag"
 	"github.com/tx7do/kratos-transport/transport/kafka"
 	"os"
+	"strings"
 
 	"message-push/app/manager/service/internal/conf"
 
@@ -28,7 +29,15 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	envCon := os.Getenv("CONFIG")
+	log.Info("envCon: ", envCon)
+	if strings.Contains(envCon, "dev") {
+		flagconf = "../../configs/local.yaml"
+	} else if strings.Contains(envCon, "prod") {
+		flagconf = "../../configs/config.yaml"
+	} else {
+		flagconf = "../../configs/config.yaml"
+	}
 }
 
 func newApp(logger log.Logger, ms *kafka.Server) *kratos.App {

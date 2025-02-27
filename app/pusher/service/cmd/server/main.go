@@ -5,6 +5,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"message-push/app/pusher/service/internal/conf"
 	"os"
+	"strings"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -27,7 +28,15 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	envCon := os.Getenv("CONFIG")
+	log.Info("envCon: ", envCon)
+	if strings.Contains(envCon, "dev") {
+		flagconf = "../../configs/local.yaml"
+	} else if strings.Contains(envCon, "prod") {
+		flagconf = "../../configs/config.yaml"
+	} else {
+		flagconf = "../../configs/config.yaml"
+	}
 }
 
 func newApp(logger log.Logger, gs *grpc.Server) *kratos.App {

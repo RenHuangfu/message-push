@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"os"
+	"strings"
 
 	"message-push/app/receiver/service/internal/conf"
 
@@ -29,7 +30,15 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	envCon := os.Getenv("CONFIG")
+	log.Info("envCon: ", envCon)
+	if strings.Contains(envCon, "dev") {
+		flagconf = "../../configs/local.yaml"
+	} else if strings.Contains(envCon, "prod") {
+		flagconf = "../../configs/config.yaml"
+	} else {
+		flagconf = "../../configs/config.yaml"
+	}
 }
 
 func newApp(logger log.Logger, hs *http.Server) *kratos.App {
