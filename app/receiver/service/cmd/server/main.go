@@ -2,10 +2,8 @@ package main
 
 import (
 	"flag"
-	"os"
-	"strings"
-
 	"message-push/app/receiver/service/internal/conf"
+	"os"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -30,15 +28,7 @@ var (
 )
 
 func init() {
-	envCon := os.Getenv("CONFIG")
-	log.Info("envCon: ", envCon)
-	if strings.Contains(envCon, "dev") {
-		flagconf = "../../configs/local.yaml"
-	} else if strings.Contains(envCon, "prod") {
-		flagconf = "../../configs/config.yaml"
-	} else {
-		flagconf = "../../configs/config.yaml"
-	}
+	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
 }
 
 func newApp(logger log.Logger, hs *http.Server) *kratos.App {
