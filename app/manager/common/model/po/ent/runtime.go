@@ -3,22 +3,25 @@
 package ent
 
 import (
-	"message-push/app/receiver/common/model/po/ent/demo"
-	"message-push/app/receiver/common/model/po/schema"
+	"message-push/app/manager/common/model/po/schema"
+	"message-push/app/receiver/common/model/po/ent/message"
+	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	demoFields := schema.Demo{}.Fields()
-	_ = demoFields
-	// demoDescName is the schema descriptor for name field.
-	demoDescName := demoFields[1].Descriptor()
-	// demo.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	demo.NameValidator = demoDescName.Validators[0].(func(string) error)
-	// demoDescID is the schema descriptor for id field.
-	demoDescID := demoFields[0].Descriptor()
-	// demo.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	demo.IDValidator = demoDescID.Validators[0].(func(int) error)
+	messageFields := schema.Message{}.Fields()
+	_ = messageFields
+	// messageDescCreateTime is the schema descriptor for create_time field.
+	messageDescCreateTime := messageFields[9].Descriptor()
+	// message.DefaultCreateTime holds the default value on creation for the create_time field.
+	message.DefaultCreateTime = messageDescCreateTime.Default.(func() time.Time)
+	// messageDescUpdateTime is the schema descriptor for update_time field.
+	messageDescUpdateTime := messageFields[10].Descriptor()
+	// message.DefaultUpdateTime holds the default value on creation for the update_time field.
+	message.DefaultUpdateTime = messageDescUpdateTime.Default.(func() time.Time)
+	// message.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	message.UpdateDefaultUpdateTime = messageDescUpdateTime.UpdateDefault.(func() time.Time)
 }

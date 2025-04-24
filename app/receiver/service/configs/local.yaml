@@ -15,5 +15,8 @@ data:
     write_timeout: 0.2s
   kafka:
     brokers:
-      - 127.0.0.1:9092
+      - 43.138.114.41:9092
     topic: demo
+  grpc:
+    endpoint: 127.0.0.1:9000
+    timeout: 1000

@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package server.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "server/api/server/v1;v1";
+service Message {
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {
+    option (google.api.http) = {
+      post: "/v1/message/set_message",
+      body: "*"
+    };
+  }
+}
+
+message SendMessageRequest {
+  int32 app_id = 1;
+  repeated int32 client_ids = 2;
+  string content = 3;
+  int64 delay = 4;
+  int64 send_time = 5;
+  int32 send_count = 6;
+}
+
+message SendMessageResponse {
+  int32 message_id = 1;
+}
+
+service TriggerEvent {
+  rpc ProcessMessage (ProcessMessageRequest) returns (ProcessMessageResponse) ;
+}
+
+message ProcessMessageRequest{
+  int32 app_id = 1;
+  int64 send_time = 2;
+  int32 send_count = 3;
+  int64 delay = 4;
+}
+
+message ProcessMessageResponse{
+  int32 status = 1;
+}

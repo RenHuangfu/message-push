@@ -8,16 +8,40 @@ import (
 	"message-push/app/receiver/common/model/po/ent"
 )
 
-// The DemoFunc type is an adapter to allow the use of ordinary
-// function as Demo mutator.
-type DemoFunc func(context.Context, *ent.DemoMutation) (ent.Value, error)
+// The BusinessAppFunc type is an adapter to allow the use of ordinary
+// function as BusinessApp mutator.
+type BusinessAppFunc func(context.Context, *ent.BusinessAppMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f DemoFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.DemoMutation); ok {
+func (f BusinessAppFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BusinessAppMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DemoMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BusinessAppMutation", m)
+}
+
+// The BusinessClientFunc type is an adapter to allow the use of ordinary
+// function as BusinessClient mutator.
+type BusinessClientFunc func(context.Context, *ent.BusinessClientMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BusinessClientFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BusinessClientMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BusinessClientMutation", m)
+}
+
+// The MessageFunc type is an adapter to allow the use of ordinary
+// function as Message mutator.
+type MessageFunc func(context.Context, *ent.MessageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MessageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MessageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MessageMutation", m)
 }
 
 // Condition is a hook condition function.

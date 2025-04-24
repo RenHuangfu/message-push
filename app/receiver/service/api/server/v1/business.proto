@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package server.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "server/api/server/v1;v1";
+service Business {
+  rpc CreateAPP(CreateAPPRequest) returns (CreateAPPResponse) {
+    option (google.api.http) = {
+      post: "/v1/business/create_app",
+      body: "*"
+    };
+  }
+  rpc GetAPP(GetAPPRequest) returns (GetAPPResponse) {
+    option (google.api.http) = {
+      post: "/v1/business/get_app",
+      body: "*"
+    };
+  }
+  rpc CreateClient(CreateClientRequest) returns (CreateClientResponse) {
+    option (google.api.http) = {
+      post: "/v1/business/create_client",
+      body: "*"
+    };
+  }
+  rpc GetClient(GetClientRequest) returns (GetClientResponse) {
+    option (google.api.http) = {
+      post: "/v1/business/get_client",
+      body: "*"
+    };
+  }
+  rpc GetClientList(GetClientListRequest) returns (GetClientListResponse) {
+    option (google.api.http) = {
+      post: "/v1/business/get_client_list",
+      body: "*"
+    };
+  }
+}
+
+message CreateAPPRequest {
+  string app_name = 1;
+  string app_key = 2;
+}
+
+message CreateAPPResponse {
+  int32 app_id = 1;
+}
+
+message GetAPPRequest {
+  int32 app_id = 1;
+}
+
+message GetAPPResponse {
+  int32 app_id = 1;
+  string app_name = 2;
+}
+
+message CreateClientRequest {
+  string client_name = 1;
+  string client_key = 2;
+  int32 app_id = 3;
+}
+
+message CreateClientResponse {
+  int32 client_id = 1;
+}
+
+message GetClientRequest {
+  int32 client_id = 1;
+}
+
+message ClientInfo {
+  int32 client_id = 1;
+  string client_name = 2;
+}
+
+message GetClientResponse {
+  ClientInfo client = 1;
+}
+
+message GetClientListRequest {
+  int32 app_id = 1;
+}
+
+message GetClientListResponse {
+  repeated ClientInfo clients = 1;
+}

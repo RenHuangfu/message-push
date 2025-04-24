@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package server.v1;
+
+option go_package = "server/api/server/v1;v1";
+
+service TriggerEvent {
+  rpc ProcessMessage (ProcessMessageRequest) returns (ProcessMessageResponse) ;
+}
+
+message ProcessMessageRequest{
+  int32 app_id = 1;
+  int64 send_time = 2;
+  int32 send_count = 3;
+  int64 delay = 4;
+}
+
+message ProcessMessageResponse{
+  int32 status = 1;
+}

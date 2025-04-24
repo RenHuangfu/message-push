@@ -42,6 +42,7 @@ services:
       MYSQL_PASSWORD: "000"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ../doc/messagepush.sql:/docker-entrypoint-initdb.d
     networks:
       - app-network
     healthcheck:

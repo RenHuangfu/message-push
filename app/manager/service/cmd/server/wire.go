@@ -18,6 +18,8 @@ func wireApp(*conf.Bootstrap, log.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(
 		di.ServerProviderSet,
 		di.ServiceProviderSet,
+		di.UsecaseProviderSet,
+		di.DataProviderSet,
 		newApp,
 	))
 }

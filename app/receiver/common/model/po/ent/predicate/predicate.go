@@ -6,5 +6,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Demo is the predicate function for demo builders.
-type Demo func(*sql.Selector)
+// BusinessApp is the predicate function for businessapp builders.
+type BusinessApp func(*sql.Selector)
+
+// BusinessClient is the predicate function for businessclient builders.
+type BusinessClient func(*sql.Selector)
+
+// Message is the predicate function for message builders.
+type Message func(*sql.Selector)

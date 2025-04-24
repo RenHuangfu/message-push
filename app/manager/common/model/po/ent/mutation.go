@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"message-push/app/receiver/common/model/po/ent/demo"
+	"message-push/app/receiver/common/model/po/ent/message"
 	"message-push/app/receiver/common/model/po/ent/predicate"
 	"sync"
 	"time"
@@ -24,34 +24,48 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeDemo = "Demo"
+	TypeMessage = "Message"
 )
 
-// DemoMutation represents an operation that mutates the Demo nodes in the graph.
-type DemoMutation struct {
+// MessageMutation represents an operation that mutates the Message nodes in the graph.
+type MessageMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	name          *string
-	create_time   *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Demo, error)
-	predicates    []predicate.Demo
+	op               Op
+	typ              string
+	id               *int
+	app_id           *int
+	addapp_id        *int
+	client_ids       *[]int
+	appendclient_ids []int
+	content          *string
+	delay            *int
+	adddelay         *int
+	send_time        *time.Time
+	send_count       *int
+	addsend_count    *int
+	status           *int
+	addstatus        *int
+	is_del           *int
+	addis_del        *int
+	create_time      *time.Time
+	update_time      *time.Time
+	clearedFields    map[string]struct{}
+	done             bool
+	oldValue         func(context.Context) (*Message, error)
+	predicates       []predicate.Message
 }
 
-var _ ent.Mutation = (*DemoMutation)(nil)
+var _ ent.Mutation = (*MessageMutation)(nil)
 
-// demoOption allows management of the mutation configuration using functional options.
-type demoOption func(*DemoMutation)
+// messageOption allows management of the mutation configuration using functional options.
+type messageOption func(*MessageMutation)
 
-// newDemoMutation creates new mutation for the Demo entity.
-func newDemoMutation(c config, op Op, opts ...demoOption) *DemoMutation {
-	m := &DemoMutation{
+// newMessageMutation creates new mutation for the Message entity.
+func newMessageMutation(c config, op Op, opts ...messageOption) *MessageMutation {
+	m := &MessageMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeDemo,
+		typ:           TypeMessage,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -60,20 +74,20 @@ func newDemoMutation(c config, op Op, opts ...demoOption) *DemoMutation {
 	return m
 }
 
-// withDemoID sets the ID field of the mutation.
-func withDemoID(id int) demoOption {
-	return func(m *DemoMutation) {
+// withMessageID sets the ID field of the mutation.
+func withMessageID(id int) messageOption {
+	return func(m *MessageMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *Demo
+			value *Message
 		)
-		m.oldValue = func(ctx context.Context) (*Demo, error) {
+		m.oldValue = func(ctx context.Context) (*Message, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().Demo.Get(ctx, id)
+					value, err = m.Client().Message.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -82,10 +96,10 @@ func withDemoID(id int) demoOption {
 	}
 }
 
-// withDemo sets the old Demo of the mutation.
-func withDemo(node *Demo) demoOption {
-	return func(m *DemoMutation) {
-		m.oldValue = func(context.Context) (*Demo, error) {
+// withMessage sets the old Message of the mutation.
+func withMessage(node *Message) messageOption {
+	return func(m *MessageMutation) {
+		m.oldValue = func(context.Context) (*Message, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -94,7 +108,7 @@ func withDemo(node *Demo) demoOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m DemoMutation) Client() *Client {
+func (m MessageMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -102,7 +116,7 @@ func (m DemoMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m DemoMutation) Tx() (*Tx, error) {
+func (m MessageMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -112,14 +126,14 @@ func (m DemoMutation) Tx() (*Tx, error) {
 }
 
 // SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of Demo entities.
-func (m *DemoMutation) SetID(id int) {
+// operation is only accepted on creation of Message entities.
+func (m *MessageMutation) SetID(id int) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *DemoMutation) ID() (id int, exists bool) {
+func (m *MessageMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -130,7 +144,7 @@ func (m *DemoMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *DemoMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *MessageMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -139,68 +153,422 @@ func (m *DemoMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Demo.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().Message.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
-// SetName sets the "name" field.
-func (m *DemoMutation) SetName(s string) {
-	m.name = &s
+// SetAppID sets the "app_id" field.
+func (m *MessageMutation) SetAppID(i int) {
+	m.app_id = &i
+	m.addapp_id = nil
 }
 
-// Name returns the value of the "name" field in the mutation.
-func (m *DemoMutation) Name() (r string, exists bool) {
-	v := m.name
+// AppID returns the value of the "app_id" field in the mutation.
+func (m *MessageMutation) AppID() (r int, exists bool) {
+	v := m.app_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the Demo entity.
-// If the Demo object wasn't provided to the builder, the object is fetched from the database.
+// OldAppID returns the old "app_id" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DemoMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *MessageMutation) OldAppID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldName is only allowed on UpdateOne operations")
+		return v, errors.New("OldAppID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an ID field in the mutation")
+		return v, errors.New("OldAppID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
+		return v, fmt.Errorf("querying old value for OldAppID: %w", err)
 	}
-	return oldValue.Name, nil
+	return oldValue.AppID, nil
 }
 
-// ClearName clears the value of the "name" field.
-func (m *DemoMutation) ClearName() {
-	m.name = nil
-	m.clearedFields[demo.FieldName] = struct{}{}
+// AddAppID adds i to the "app_id" field.
+func (m *MessageMutation) AddAppID(i int) {
+	if m.addapp_id != nil {
+		*m.addapp_id += i
+	} else {
+		m.addapp_id = &i
+	}
 }
 
-// NameCleared returns if the "name" field was cleared in this mutation.
-func (m *DemoMutation) NameCleared() bool {
-	_, ok := m.clearedFields[demo.FieldName]
-	return ok
+// AddedAppID returns the value that was added to the "app_id" field in this mutation.
+func (m *MessageMutation) AddedAppID() (r int, exists bool) {
+	v := m.addapp_id
+	if v == nil {
+		return
+	}
+	return *v, true
 }
 
-// ResetName resets all changes to the "name" field.
-func (m *DemoMutation) ResetName() {
-	m.name = nil
-	delete(m.clearedFields, demo.FieldName)
+// ResetAppID resets all changes to the "app_id" field.
+func (m *MessageMutation) ResetAppID() {
+	m.app_id = nil
+	m.addapp_id = nil
+}
+
+// SetClientIds sets the "client_ids" field.
+func (m *MessageMutation) SetClientIds(i []int) {
+	m.client_ids = &i
+	m.appendclient_ids = nil
+}
+
+// ClientIds returns the value of the "client_ids" field in the mutation.
+func (m *MessageMutation) ClientIds() (r []int, exists bool) {
+	v := m.client_ids
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldClientIds returns the old "client_ids" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldClientIds(ctx context.Context) (v []int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldClientIds is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldClientIds requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldClientIds: %w", err)
+	}
+	return oldValue.ClientIds, nil
+}
+
+// AppendClientIds adds i to the "client_ids" field.
+func (m *MessageMutation) AppendClientIds(i []int) {
+	m.appendclient_ids = append(m.appendclient_ids, i...)
+}
+
+// AppendedClientIds returns the list of values that were appended to the "client_ids" field in this mutation.
+func (m *MessageMutation) AppendedClientIds() ([]int, bool) {
+	if len(m.appendclient_ids) == 0 {
+		return nil, false
+	}
+	return m.appendclient_ids, true
+}
+
+// ResetClientIds resets all changes to the "client_ids" field.
+func (m *MessageMutation) ResetClientIds() {
+	m.client_ids = nil
+	m.appendclient_ids = nil
+}
+
+// SetContent sets the "content" field.
+func (m *MessageMutation) SetContent(s string) {
+	m.content = &s
+}
+
+// Content returns the value of the "content" field in the mutation.
+func (m *MessageMutation) Content() (r string, exists bool) {
+	v := m.content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContent returns the old "content" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldContent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContent: %w", err)
+	}
+	return oldValue.Content, nil
+}
+
+// ResetContent resets all changes to the "content" field.
+func (m *MessageMutation) ResetContent() {
+	m.content = nil
+}
+
+// SetDelay sets the "delay" field.
+func (m *MessageMutation) SetDelay(i int) {
+	m.delay = &i
+	m.adddelay = nil
+}
+
+// Delay returns the value of the "delay" field in the mutation.
+func (m *MessageMutation) Delay() (r int, exists bool) {
+	v := m.delay
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDelay returns the old "delay" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldDelay(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDelay is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDelay requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDelay: %w", err)
+	}
+	return oldValue.Delay, nil
+}
+
+// AddDelay adds i to the "delay" field.
+func (m *MessageMutation) AddDelay(i int) {
+	if m.adddelay != nil {
+		*m.adddelay += i
+	} else {
+		m.adddelay = &i
+	}
+}
+
+// AddedDelay returns the value that was added to the "delay" field in this mutation.
+func (m *MessageMutation) AddedDelay() (r int, exists bool) {
+	v := m.adddelay
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDelay resets all changes to the "delay" field.
+func (m *MessageMutation) ResetDelay() {
+	m.delay = nil
+	m.adddelay = nil
+}
+
+// SetSendTime sets the "send_time" field.
+func (m *MessageMutation) SetSendTime(t time.Time) {
+	m.send_time = &t
+}
+
+// SendTime returns the value of the "send_time" field in the mutation.
+func (m *MessageMutation) SendTime() (r time.Time, exists bool) {
+	v := m.send_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSendTime returns the old "send_time" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldSendTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSendTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSendTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSendTime: %w", err)
+	}
+	return oldValue.SendTime, nil
+}
+
+// ResetSendTime resets all changes to the "send_time" field.
+func (m *MessageMutation) ResetSendTime() {
+	m.send_time = nil
+}
+
+// SetSendCount sets the "send_count" field.
+func (m *MessageMutation) SetSendCount(i int) {
+	m.send_count = &i
+	m.addsend_count = nil
+}
+
+// SendCount returns the value of the "send_count" field in the mutation.
+func (m *MessageMutation) SendCount() (r int, exists bool) {
+	v := m.send_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSendCount returns the old "send_count" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldSendCount(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSendCount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSendCount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSendCount: %w", err)
+	}
+	return oldValue.SendCount, nil
+}
+
+// AddSendCount adds i to the "send_count" field.
+func (m *MessageMutation) AddSendCount(i int) {
+	if m.addsend_count != nil {
+		*m.addsend_count += i
+	} else {
+		m.addsend_count = &i
+	}
+}
+
+// AddedSendCount returns the value that was added to the "send_count" field in this mutation.
+func (m *MessageMutation) AddedSendCount() (r int, exists bool) {
+	v := m.addsend_count
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSendCount resets all changes to the "send_count" field.
+func (m *MessageMutation) ResetSendCount() {
+	m.send_count = nil
+	m.addsend_count = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *MessageMutation) SetStatus(i int) {
+	m.status = &i
+	m.addstatus = nil
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *MessageMutation) Status() (r int, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldStatus(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// AddStatus adds i to the "status" field.
+func (m *MessageMutation) AddStatus(i int) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *MessageMutation) AddedStatus() (r int, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *MessageMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
+}
+
+// SetIsDel sets the "is_del" field.
+func (m *MessageMutation) SetIsDel(i int) {
+	m.is_del = &i
+	m.addis_del = nil
+}
+
+// IsDel returns the value of the "is_del" field in the mutation.
+func (m *MessageMutation) IsDel() (r int, exists bool) {
+	v := m.is_del
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsDel returns the old "is_del" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldIsDel(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsDel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsDel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsDel: %w", err)
+	}
+	return oldValue.IsDel, nil
+}
+
+// AddIsDel adds i to the "is_del" field.
+func (m *MessageMutation) AddIsDel(i int) {
+	if m.addis_del != nil {
+		*m.addis_del += i
+	} else {
+		m.addis_del = &i
+	}
+}
+
+// AddedIsDel returns the value that was added to the "is_del" field in this mutation.
+func (m *MessageMutation) AddedIsDel() (r int, exists bool) {
+	v := m.addis_del
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetIsDel resets all changes to the "is_del" field.
+func (m *MessageMutation) ResetIsDel() {
+	m.is_del = nil
+	m.addis_del = nil
 }
 
 // SetCreateTime sets the "create_time" field.
-func (m *DemoMutation) SetCreateTime(t time.Time) {
+func (m *MessageMutation) SetCreateTime(t time.Time) {
 	m.create_time = &t
 }
 
 // CreateTime returns the value of the "create_time" field in the mutation.
-func (m *DemoMutation) CreateTime() (r time.Time, exists bool) {
+func (m *MessageMutation) CreateTime() (r time.Time, exists bool) {
 	v := m.create_time
 	if v == nil {
 		return
@@ -208,10 +576,10 @@ func (m *DemoMutation) CreateTime() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldCreateTime returns the old "create_time" field's value of the Demo entity.
-// If the Demo object wasn't provided to the builder, the object is fetched from the database.
+// OldCreateTime returns the old "create_time" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DemoMutation) OldCreateTime(ctx context.Context) (v *time.Time, err error) {
+func (m *MessageMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
 	}
@@ -225,33 +593,56 @@ func (m *DemoMutation) OldCreateTime(ctx context.Context) (v *time.Time, err err
 	return oldValue.CreateTime, nil
 }
 
-// ClearCreateTime clears the value of the "create_time" field.
-func (m *DemoMutation) ClearCreateTime() {
-	m.create_time = nil
-	m.clearedFields[demo.FieldCreateTime] = struct{}{}
-}
-
-// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
-func (m *DemoMutation) CreateTimeCleared() bool {
-	_, ok := m.clearedFields[demo.FieldCreateTime]
-	return ok
-}
-
 // ResetCreateTime resets all changes to the "create_time" field.
-func (m *DemoMutation) ResetCreateTime() {
+func (m *MessageMutation) ResetCreateTime() {
 	m.create_time = nil
-	delete(m.clearedFields, demo.FieldCreateTime)
 }
 
-// Where appends a list predicates to the DemoMutation builder.
-func (m *DemoMutation) Where(ps ...predicate.Demo) {
+// SetUpdateTime sets the "update_time" field.
+func (m *MessageMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *MessageMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the Message entity.
+// If the Message object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MessageMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *MessageMutation) ResetUpdateTime() {
+	m.update_time = nil
+}
+
+// Where appends a list predicates to the MessageMutation builder.
+func (m *MessageMutation) Where(ps ...predicate.Message) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the DemoMutation builder. Using this method,
+// WhereP appends storage-level predicates to the MessageMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *DemoMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Demo, len(ps))
+func (m *MessageMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Message, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -259,30 +650,54 @@ func (m *DemoMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *DemoMutation) Op() Op {
+func (m *MessageMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *DemoMutation) SetOp(op Op) {
+func (m *MessageMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (Demo).
-func (m *DemoMutation) Type() string {
+// Type returns the node type of this mutation (Message).
+func (m *MessageMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *DemoMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.name != nil {
-		fields = append(fields, demo.FieldName)
+func (m *MessageMutation) Fields() []string {
+	fields := make([]string, 0, 10)
+	if m.app_id != nil {
+		fields = append(fields, message.FieldAppID)
+	}
+	if m.client_ids != nil {
+		fields = append(fields, message.FieldClientIds)
+	}
+	if m.content != nil {
+		fields = append(fields, message.FieldContent)
+	}
+	if m.delay != nil {
+		fields = append(fields, message.FieldDelay)
+	}
+	if m.send_time != nil {
+		fields = append(fields, message.FieldSendTime)
+	}
+	if m.send_count != nil {
+		fields = append(fields, message.FieldSendCount)
+	}
+	if m.status != nil {
+		fields = append(fields, message.FieldStatus)
+	}
+	if m.is_del != nil {
+		fields = append(fields, message.FieldIsDel)
 	}
 	if m.create_time != nil {
-		fields = append(fields, demo.FieldCreateTime)
+		fields = append(fields, message.FieldCreateTime)
+	}
+	if m.update_time != nil {
+		fields = append(fields, message.FieldUpdateTime)
 	}
 	return fields
 }
@@ -290,12 +705,28 @@ func (m *DemoMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *DemoMutation) Field(name string) (ent.Value, bool) {
+func (m *MessageMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case demo.FieldName:
-		return m.Name()
-	case demo.FieldCreateTime:
+	case message.FieldAppID:
+		return m.AppID()
+	case message.FieldClientIds:
+		return m.ClientIds()
+	case message.FieldContent:
+		return m.Content()
+	case message.FieldDelay:
+		return m.Delay()
+	case message.FieldSendTime:
+		return m.SendTime()
+	case message.FieldSendCount:
+		return m.SendCount()
+	case message.FieldStatus:
+		return m.Status()
+	case message.FieldIsDel:
+		return m.IsDel()
+	case message.FieldCreateTime:
 		return m.CreateTime()
+	case message.FieldUpdateTime:
+		return m.UpdateTime()
 	}
 	return nil, false
 }
@@ -303,153 +734,297 @@ func (m *DemoMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *DemoMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *MessageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case demo.FieldName:
-		return m.OldName(ctx)
-	case demo.FieldCreateTime:
+	case message.FieldAppID:
+		return m.OldAppID(ctx)
+	case message.FieldClientIds:
+		return m.OldClientIds(ctx)
+	case message.FieldContent:
+		return m.OldContent(ctx)
+	case message.FieldDelay:
+		return m.OldDelay(ctx)
+	case message.FieldSendTime:
+		return m.OldSendTime(ctx)
+	case message.FieldSendCount:
+		return m.OldSendCount(ctx)
+	case message.FieldStatus:
+		return m.OldStatus(ctx)
+	case message.FieldIsDel:
+		return m.OldIsDel(ctx)
+	case message.FieldCreateTime:
 		return m.OldCreateTime(ctx)
+	case message.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
 	}
-	return nil, fmt.Errorf("unknown Demo field %s", name)
+	return nil, fmt.Errorf("unknown Message field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *DemoMutation) SetField(name string, value ent.Value) error {
+func (m *MessageMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case demo.FieldName:
+	case message.FieldAppID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAppID(v)
+		return nil
+	case message.FieldClientIds:
+		v, ok := value.([]int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetClientIds(v)
+		return nil
+	case message.FieldContent:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetName(v)
+		m.SetContent(v)
 		return nil
-	case demo.FieldCreateTime:
+	case message.FieldDelay:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDelay(v)
+		return nil
+	case message.FieldSendTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSendTime(v)
+		return nil
+	case message.FieldSendCount:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSendCount(v)
+		return nil
+	case message.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case message.FieldIsDel:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsDel(v)
+		return nil
+	case message.FieldCreateTime:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreateTime(v)
 		return nil
+	case message.FieldUpdateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTime(v)
+		return nil
 	}
-	return fmt.Errorf("unknown Demo field %s", name)
+	return fmt.Errorf("unknown Message field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *DemoMutation) AddedFields() []string {
-	return nil
+func (m *MessageMutation) AddedFields() []string {
+	var fields []string
+	if m.addapp_id != nil {
+		fields = append(fields, message.FieldAppID)
+	}
+	if m.adddelay != nil {
+		fields = append(fields, message.FieldDelay)
+	}
+	if m.addsend_count != nil {
+		fields = append(fields, message.FieldSendCount)
+	}
+	if m.addstatus != nil {
+		fields = append(fields, message.FieldStatus)
+	}
+	if m.addis_del != nil {
+		fields = append(fields, message.FieldIsDel)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *DemoMutation) AddedField(name string) (ent.Value, bool) {
+func (m *MessageMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case message.FieldAppID:
+		return m.AddedAppID()
+	case message.FieldDelay:
+		return m.AddedDelay()
+	case message.FieldSendCount:
+		return m.AddedSendCount()
+	case message.FieldStatus:
+		return m.AddedStatus()
+	case message.FieldIsDel:
+		return m.AddedIsDel()
+	}
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *DemoMutation) AddField(name string, value ent.Value) error {
+func (m *MessageMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case message.FieldAppID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAppID(v)
+		return nil
+	case message.FieldDelay:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDelay(v)
+		return nil
+	case message.FieldSendCount:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSendCount(v)
+		return nil
+	case message.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
+	case message.FieldIsDel:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddIsDel(v)
+		return nil
 	}
-	return fmt.Errorf("unknown Demo numeric field %s", name)
+	return fmt.Errorf("unknown Message numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *DemoMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(demo.FieldName) {
-		fields = append(fields, demo.FieldName)
-	}
-	if m.FieldCleared(demo.FieldCreateTime) {
-		fields = append(fields, demo.FieldCreateTime)
-	}
-	return fields
+func (m *MessageMutation) ClearedFields() []string {
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *DemoMutation) FieldCleared(name string) bool {
+func (m *MessageMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *DemoMutation) ClearField(name string) error {
-	switch name {
-	case demo.FieldName:
-		m.ClearName()
-		return nil
-	case demo.FieldCreateTime:
-		m.ClearCreateTime()
-		return nil
-	}
-	return fmt.Errorf("unknown Demo nullable field %s", name)
+func (m *MessageMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Message nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *DemoMutation) ResetField(name string) error {
+func (m *MessageMutation) ResetField(name string) error {
 	switch name {
-	case demo.FieldName:
-		m.ResetName()
+	case message.FieldAppID:
+		m.ResetAppID()
 		return nil
-	case demo.FieldCreateTime:
+	case message.FieldClientIds:
+		m.ResetClientIds()
+		return nil
+	case message.FieldContent:
+		m.ResetContent()
+		return nil
+	case message.FieldDelay:
+		m.ResetDelay()
+		return nil
+	case message.FieldSendTime:
+		m.ResetSendTime()
+		return nil
+	case message.FieldSendCount:
+		m.ResetSendCount()
+		return nil
+	case message.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case message.FieldIsDel:
+		m.ResetIsDel()
+		return nil
+	case message.FieldCreateTime:
 		m.ResetCreateTime()
 		return nil
+	case message.FieldUpdateTime:
+		m.ResetUpdateTime()
+		return nil
 	}
-	return fmt.Errorf("unknown Demo field %s", name)
+	return fmt.Errorf("unknown Message field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *DemoMutation) AddedEdges() []string {
+func (m *MessageMutation) AddedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *DemoMutation) AddedIDs(name string) []ent.Value {
+func (m *MessageMutation) AddedIDs(name string) []ent.Value {
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *DemoMutation) RemovedEdges() []string {
+func (m *MessageMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *DemoMutation) RemovedIDs(name string) []ent.Value {
+func (m *MessageMutation) RemovedIDs(name string) []ent.Value {
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *DemoMutation) ClearedEdges() []string {
+func (m *MessageMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *DemoMutation) EdgeCleared(name string) bool {
+func (m *MessageMutation) EdgeCleared(name string) bool {
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *DemoMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown Demo unique edge %s", name)
+func (m *MessageMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Message unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *DemoMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown Demo edge %s", name)
+func (m *MessageMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Message edge %s", name)
 }

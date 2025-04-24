@@ -28,10 +28,13 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	if err != nil {
 		return nil, nil, err
 	}
-	demo := data.NewDemo(dataData, logger)
-	demoUsecase := usecase.NewDemo(logger, demo)
-	serviceDemo := service.NewDemo(logger, demoUsecase)
-	httpServer := server.NewHTTPServer(bootstrap, serviceDemo)
+	businessRepo := data.NewBusinessRepo(dataData, logger)
+	businessUsecase := usecase.NewBusinessUsecase(logger, businessRepo)
+	businessService := service.NewBusinessService(logger, businessUsecase)
+	messageRepo := data.NewMessageRepo(logger, dataData)
+	messageUsecase := usecase.NewMessageUsecase(logger, messageRepo)
+	messageService := service.NewMessageService(logger, messageUsecase)
+	httpServer := server.NewHTTPServer(bootstrap, businessService, messageService)
 	app := newApp(logger, httpServer)
 	return app, func() {
 		cleanup()

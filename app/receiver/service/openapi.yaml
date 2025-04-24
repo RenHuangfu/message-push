@@ -3,21 +3,19 @@
 
 openapi: 3.0.3
 info:
-    title: Demo API
-    description: The greeting service definition.
+    title: ""
     version: 0.0.1
 paths:
-    /demo_create_name:
+    /v1/business/create_app:
         post:
             tags:
-                - Demo
-            description: Sends a greeting
-            operationId: Demo_DemoCreateName
+                - Business
+            operationId: Business_CreateAPP
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/server.v1.DemoCreateNameRequest'
+                            $ref: '#/components/schemas/server.v1.CreateAPPRequest'
                 required: true
             responses:
                 "200":
@@ -25,17 +23,17 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/server.v1.DemoCreateNameResponse'
-    /demo_push:
+                                $ref: '#/components/schemas/server.v1.CreateAPPResponse'
+    /v1/business/create_client:
         post:
             tags:
-                - Demo
-            operationId: Demo_DemoMessage
+                - Business
+            operationId: Business_CreateClient
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/server.v1.DemoMessageRequest'
+                            $ref: '#/components/schemas/server.v1.CreateClientRequest'
                 required: true
             responses:
                 "200":
@@ -43,17 +41,17 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/server.v1.DemoMessageResponse'
-    /demo_search_name:
+                                $ref: '#/components/schemas/server.v1.CreateClientResponse'
+    /v1/business/get_app:
         post:
             tags:
-                - Demo
-            operationId: Demo_DemoSearchName
+                - Business
+            operationId: Business_GetAPP
             requestBody:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/server.v1.DemoSearchNameRequest'
+                            $ref: '#/components/schemas/server.v1.GetAPPRequest'
                 required: true
             responses:
                 "200":
@@ -61,44 +59,164 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/server.v1.DemoSearchNameResponse'
+                                $ref: '#/components/schemas/server.v1.GetAPPResponse'
+    /v1/business/get_client:
+        post:
+            tags:
+                - Business
+            operationId: Business_GetClient
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/server.v1.GetClientRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/server.v1.GetClientResponse'
+    /v1/business/get_client_list:
+        post:
+            tags:
+                - Business
+            operationId: Business_GetClientList
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/server.v1.GetClientListRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/server.v1.GetClientListResponse'
+    /v1/message/set_message:
+        post:
+            tags:
+                - Message
+            operationId: Message_SendMessage
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/server.v1.SendMessageRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/server.v1.SendMessageResponse'
 components:
     schemas:
-        server.v1.DemoCreateNameRequest:
+        server.v1.ClientInfo:
             type: object
             properties:
-                name:
-                    type: string
-            description: The request message containing the user's name.
-        server.v1.DemoCreateNameResponse:
-            type: object
-            properties:
-                message:
-                    type: string
-            description: The response message containing the greetings
-        server.v1.DemoMessageRequest:
-            type: object
-            properties:
-                id:
+                clientId:
                     type: integer
                     format: int32
-        server.v1.DemoMessageResponse:
-            type: object
-            properties:
-                message:
+                clientName:
                     type: string
-        server.v1.DemoSearchNameRequest:
+        server.v1.CreateAPPRequest:
             type: object
             properties:
-                id:
+                appName:
+                    type: string
+                appKey:
+                    type: string
+        server.v1.CreateAPPResponse:
+            type: object
+            properties:
+                appId:
                     type: integer
                     format: int32
-        server.v1.DemoSearchNameResponse:
+        server.v1.CreateClientRequest:
             type: object
             properties:
-                exist:
-                    type: boolean
-                name:
+                clientName:
                     type: string
+                clientKey:
+                    type: string
+                appId:
+                    type: integer
+                    format: int32
+        server.v1.CreateClientResponse:
+            type: object
+            properties:
+                clientId:
+                    type: integer
+                    format: int32
+        server.v1.GetAPPRequest:
+            type: object
+            properties:
+                appId:
+                    type: integer
+                    format: int32
+        server.v1.GetAPPResponse:
+            type: object
+            properties:
+                appId:
+                    type: integer
+                    format: int32
+                appName:
+                    type: string
+        server.v1.GetClientListRequest:
+            type: object
+            properties:
+                appId:
+                    type: integer
+                    format: int32
+        server.v1.GetClientListResponse:
+            type: object
+            properties:
+                clients:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/server.v1.ClientInfo'
+        server.v1.GetClientRequest:
+            type: object
+            properties:
+                clientId:
+                    type: integer
+                    format: int32
+        server.v1.GetClientResponse:
+            type: object
+            properties:
+                client:
+                    $ref: '#/components/schemas/server.v1.ClientInfo'
+        server.v1.SendMessageRequest:
+            type: object
+            properties:
+                appId:
+                    type: integer
+                    format: int32
+                clientIds:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                content:
+                    type: string
+                delay:
+                    type: string
+                sendTime:
+                    type: string
+                sendCount:
+                    type: integer
+                    format: int32
+        server.v1.SendMessageResponse:
+            type: object
+            properties:
+                messageId:
+                    type: integer
+                    format: int32
 tags:
-    - name: Demo
+    - name: Business
+    - name: Message

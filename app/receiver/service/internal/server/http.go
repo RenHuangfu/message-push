@@ -12,7 +12,8 @@ import (
 // NewHTTPServer new an HTTP server.
 func NewHTTPServer(
 	c *conf.Bootstrap,
-	demo *service.Demo,
+	business *service.BusinessService,
+	message *service.MessageService,
 ) *http.Server {
 	var opts = []http.ServerOption{
 		http.Middleware(
@@ -30,6 +31,7 @@ func NewHTTPServer(
 		opts = append(opts, http.Timeout(server.Http.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
-	v1.RegisterDemoHTTPServer(srv, demo)
+	v1.RegisterBusinessHTTPServer(srv, business)
+	v1.RegisterMessageHTTPServer(srv, message)
 	return srv
 }

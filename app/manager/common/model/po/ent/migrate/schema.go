@@ -8,21 +8,29 @@ import (
 )
 
 var (
-	// DemosColumns holds the columns for the "demos" table.
-	DemosColumns = []*schema.Column{
+	// MessagesColumns holds the columns for the "messages" table.
+	MessagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Nullable: true, Size: 10},
-		{Name: "create_time", Type: field.TypeTime, Nullable: true},
+		{Name: "app_id", Type: field.TypeInt},
+		{Name: "client_ids", Type: field.TypeJSON},
+		{Name: "content", Type: field.TypeString},
+		{Name: "delay", Type: field.TypeInt},
+		{Name: "send_time", Type: field.TypeTime},
+		{Name: "send_count", Type: field.TypeInt},
+		{Name: "status", Type: field.TypeInt},
+		{Name: "is_del", Type: field.TypeInt},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
 	}
-	// DemosTable holds the schema information for the "demos" table.
-	DemosTable = &schema.Table{
-		Name:       "demos",
-		Columns:    DemosColumns,
-		PrimaryKey: []*schema.Column{DemosColumns[0]},
+	// MessagesTable holds the schema information for the "messages" table.
+	MessagesTable = &schema.Table{
+		Name:       "messages",
+		Columns:    MessagesColumns,
+		PrimaryKey: []*schema.Column{MessagesColumns[0]},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		DemosTable,
+		MessagesTable,
 	}
 )
 

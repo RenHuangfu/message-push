@@ -3,15 +3,12 @@ package di
 import (
 	"github.com/google/wire"
 	"message-push/app/pusher/service/internal/server"
-	"message-push/app/pusher/service/internal/service"
 )
 
 var (
 	ServerProviderSet = wire.NewSet(
-		server.NewGRPCServer,
+		server.NewKafkaServer,
 	)
 
-	ServiceProviderSet = wire.NewSet(
-		service.NewDemo,
-	)
+	ServiceProviderSet = wire.NewSet()
 )

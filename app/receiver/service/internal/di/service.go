@@ -14,15 +14,18 @@ var (
 	)
 
 	ServiceProviderSet = wire.NewSet(
-		service.NewDemo,
+		service.NewBusinessService,
+		service.NewMessageService,
 	)
 
 	UsecaseProviderSet = wire.NewSet(
-		usecase.NewDemo,
+		usecase.NewBusinessUsecase,
+		usecase.NewMessageUsecase,
 	)
 
 	DataProviderSet = wire.NewSet(
+		data.NewBusinessRepo,
+		data.NewMessageRepo,
 		data.NewData,
-		data.NewDemo,
 	)
 )

@@ -6,7 +6,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"message-push/app/receiver/common/model/po/ent/demo"
+	"message-push/app/receiver/common/model/po/ent/businessapp"
+	"message-push/app/receiver/common/model/po/ent/businessclient"
+	"message-push/app/receiver/common/model/po/ent/message"
 	"reflect"
 	"sync"
 
@@ -73,7 +75,9 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			demo.Table: demo.ValidColumn,
+			businessapp.Table:    businessapp.ValidColumn,
+			businessclient.Table: businessclient.ValidColumn,
+			message.Table:        message.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

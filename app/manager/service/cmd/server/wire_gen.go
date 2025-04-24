@@ -10,8 +10,10 @@ import (
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"message-push/app/manager/service/internal/conf"
+	"message-push/app/manager/service/internal/data"
 	"message-push/app/manager/service/internal/server"
 	"message-push/app/manager/service/internal/service"
+	"message-push/app/manager/service/internal/usecase"
 )
 
 import (
@@ -22,9 +24,16 @@ import (
 
 // wireApp init kratos application.
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
-	demo := service.NewDemo(logger, bootstrap)
-	kafkaServer := server.NewKafkaServer(bootstrap, logger, demo)
-	app := newApp(logger, kafkaServer)
+	dataData, cleanup, err := data.NewData(bootstrap, logger)
+	if err != nil {
+		return nil, nil, err
+	}
+	triggerRepo := data.NewTriggerRepo(logger, dataData)
+	triggerUsecase := usecase.NewTriggerUsecase(logger, triggerRepo)
+	triggerService := service.NewTriggerService(logger, triggerUsecase)
+	grpcServer := server.NewGRPCServer(bootstrap, triggerService)
+	app := newApp(logger, grpcServer)
 	return app, func() {
+		cleanup()
 	}, nil
 }

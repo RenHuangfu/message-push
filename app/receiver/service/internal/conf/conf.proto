@@ -19,6 +19,7 @@ message Data {
   Database database = 1;
   Redis redis = 2;
   Kafka kafka = 3;
+  Grpc grpc = 4;
 }
 
 message HTTP {
@@ -48,4 +49,9 @@ message Redis {
 message Kafka {
   repeated string brokers = 1;
   string topic = 2;
+}
+
+message Grpc {
+  string endpoint = 1;  // 服务发现地址（如：discovery:///user.service）
+  int64 timeout = 2;    // 超时时间（毫秒）
 }

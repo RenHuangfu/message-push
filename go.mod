@@ -4,10 +4,12 @@ go 1.23.6
 
 require (
 	entgo.io/ent v0.14.2
-	github.com/RenHuangfu/tools v0.0.0-20250225081802-774e101e8d0f
+	github.com/RenHuangfu/tools v0.0.0-20250415131010-77b55f288d0f
 	github.com/go-kratos/kratos/v2 v2.8.3
 	github.com/go-sql-driver/mysql v1.9.0
 	github.com/google/wire v0.6.0
+	github.com/tx7do/kratos-transport v1.1.12
+	github.com/tx7do/kratos-transport/transport/kafka v1.2.18
 	go.uber.org/automaxprocs v1.6.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250224174004-546df14abb99
 	google.golang.org/grpc v1.70.0
@@ -36,6 +38,7 @@ require (
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1 // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -48,9 +51,7 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/segmentio/kafka-go v0.4.47 // indirect
-	github.com/tx7do/kratos-transport v1.1.12 // indirect
 	github.com/tx7do/kratos-transport/broker/kafka v1.2.17 // indirect
-	github.com/tx7do/kratos-transport/transport/kafka v1.2.18 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect

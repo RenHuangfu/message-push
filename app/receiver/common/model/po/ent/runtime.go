@@ -3,22 +3,213 @@
 package ent
 
 import (
-	"message-push/app/receiver/common/model/po/ent/demo"
+	"message-push/app/receiver/common/model/po/ent/businessapp"
+	"message-push/app/receiver/common/model/po/ent/businessclient"
+	"message-push/app/receiver/common/model/po/ent/message"
 	"message-push/app/receiver/common/model/po/schema"
+	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	demoFields := schema.Demo{}.Fields()
-	_ = demoFields
-	// demoDescName is the schema descriptor for name field.
-	demoDescName := demoFields[1].Descriptor()
-	// demo.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	demo.NameValidator = demoDescName.Validators[0].(func(string) error)
-	// demoDescID is the schema descriptor for id field.
-	demoDescID := demoFields[0].Descriptor()
-	// demo.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	demo.IDValidator = demoDescID.Validators[0].(func(int) error)
+	businessappFields := schema.BusinessApp{}.Fields()
+	_ = businessappFields
+	// businessappDescName is the schema descriptor for name field.
+	businessappDescName := businessappFields[1].Descriptor()
+	// businessapp.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	businessapp.NameValidator = func() func(string) error {
+		validators := businessappDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// businessappDescAppKey is the schema descriptor for app_key field.
+	businessappDescAppKey := businessappFields[2].Descriptor()
+	// businessapp.AppKeyValidator is a validator for the "app_key" field. It is called by the builders before save.
+	businessapp.AppKeyValidator = func() func(string) error {
+		validators := businessappDescAppKey.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(app_key string) error {
+			for _, fn := range fns {
+				if err := fn(app_key); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// businessappDescAppID is the schema descriptor for app_id field.
+	businessappDescAppID := businessappFields[3].Descriptor()
+	// businessapp.AppIDValidator is a validator for the "app_id" field. It is called by the builders before save.
+	businessapp.AppIDValidator = func() func(string) error {
+		validators := businessappDescAppID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(app_id string) error {
+			for _, fn := range fns {
+				if err := fn(app_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// businessappDescAppType is the schema descriptor for app_type field.
+	businessappDescAppType := businessappFields[4].Descriptor()
+	// businessapp.AppTypeValidator is a validator for the "app_type" field. It is called by the builders before save.
+	businessapp.AppTypeValidator = func() func(string) error {
+		validators := businessappDescAppType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(app_type string) error {
+			for _, fn := range fns {
+				if err := fn(app_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// businessappDescCreateTime is the schema descriptor for create_time field.
+	businessappDescCreateTime := businessappFields[6].Descriptor()
+	// businessapp.DefaultCreateTime holds the default value on creation for the create_time field.
+	businessapp.DefaultCreateTime = businessappDescCreateTime.Default.(func() time.Time)
+	// businessappDescUpdateTime is the schema descriptor for update_time field.
+	businessappDescUpdateTime := businessappFields[7].Descriptor()
+	// businessapp.DefaultUpdateTime holds the default value on creation for the update_time field.
+	businessapp.DefaultUpdateTime = businessappDescUpdateTime.Default.(func() time.Time)
+	// businessapp.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	businessapp.UpdateDefaultUpdateTime = businessappDescUpdateTime.UpdateDefault.(func() time.Time)
+	businessclientFields := schema.BusinessClient{}.Fields()
+	_ = businessclientFields
+	// businessclientDescName is the schema descriptor for name field.
+	businessclientDescName := businessclientFields[1].Descriptor()
+	// businessclient.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	businessclient.NameValidator = func() func(string) error {
+		validators := businessclientDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// businessclientDescClientKey is the schema descriptor for client_key field.
+	businessclientDescClientKey := businessclientFields[2].Descriptor()
+	// businessclient.ClientKeyValidator is a validator for the "client_key" field. It is called by the builders before save.
+	businessclient.ClientKeyValidator = func() func(string) error {
+		validators := businessclientDescClientKey.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(client_key string) error {
+			for _, fn := range fns {
+				if err := fn(client_key); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// businessclientDescAppID is the schema descriptor for app_id field.
+	businessclientDescAppID := businessclientFields[3].Descriptor()
+	// businessclient.AppIDValidator is a validator for the "app_id" field. It is called by the builders before save.
+	businessclient.AppIDValidator = func() func(string) error {
+		validators := businessclientDescAppID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(app_id string) error {
+			for _, fn := range fns {
+				if err := fn(app_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// businessclientDescClientID is the schema descriptor for client_id field.
+	businessclientDescClientID := businessclientFields[4].Descriptor()
+	// businessclient.ClientIDValidator is a validator for the "client_id" field. It is called by the builders before save.
+	businessclient.ClientIDValidator = func() func(string) error {
+		validators := businessclientDescClientID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(client_id string) error {
+			for _, fn := range fns {
+				if err := fn(client_id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// businessclientDescClientType is the schema descriptor for client_type field.
+	businessclientDescClientType := businessclientFields[5].Descriptor()
+	// businessclient.ClientTypeValidator is a validator for the "client_type" field. It is called by the builders before save.
+	businessclient.ClientTypeValidator = func() func(string) error {
+		validators := businessclientDescClientType.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(client_type string) error {
+			for _, fn := range fns {
+				if err := fn(client_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// businessclientDescCreateTime is the schema descriptor for create_time field.
+	businessclientDescCreateTime := businessclientFields[7].Descriptor()
+	// businessclient.DefaultCreateTime holds the default value on creation for the create_time field.
+	businessclient.DefaultCreateTime = businessclientDescCreateTime.Default.(func() time.Time)
+	// businessclientDescUpdateTime is the schema descriptor for update_time field.
+	businessclientDescUpdateTime := businessclientFields[8].Descriptor()
+	// businessclient.DefaultUpdateTime holds the default value on creation for the update_time field.
+	businessclient.DefaultUpdateTime = businessclientDescUpdateTime.Default.(func() time.Time)
+	// businessclient.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	businessclient.UpdateDefaultUpdateTime = businessclientDescUpdateTime.UpdateDefault.(func() time.Time)
+	messageFields := schema.Message{}.Fields()
+	_ = messageFields
+	// messageDescCreateTime is the schema descriptor for create_time field.
+	messageDescCreateTime := messageFields[9].Descriptor()
+	// message.DefaultCreateTime holds the default value on creation for the create_time field.
+	message.DefaultCreateTime = messageDescCreateTime.Default.(func() time.Time)
+	// messageDescUpdateTime is the schema descriptor for update_time field.
+	messageDescUpdateTime := messageFields[10].Descriptor()
+	// message.DefaultUpdateTime holds the default value on creation for the update_time field.
+	message.DefaultUpdateTime = messageDescUpdateTime.Default.(func() time.Time)
+	// message.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	message.UpdateDefaultUpdateTime = messageDescUpdateTime.UpdateDefault.(func() time.Time)
 }
