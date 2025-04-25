@@ -8,16 +8,12 @@ server:
 data:
   database:
     driver: mysql
-    source: root:000@tcp(127.0.0.1:3306)/messagepush?parseTime=True&loc=Local
+    source: root:000@tcp(43.138.114.41:3306)/messagepush?parseTime=True&loc=Local
   redis:
-    addr: 127.0.0.1:6379
+    addr: 43.138.114.41:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
   kafka:
     brokers:
       - 43.138.114.41:9092
-    topic: demo
-client:
-  user:
-    endpoint: 127.0.0.1:9001
-    timeout: 1000
+    topic: one_topic

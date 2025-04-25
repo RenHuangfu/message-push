@@ -17,6 +17,7 @@ import (
 func wireApp(*conf.Bootstrap, log.Logger) (*kratos.App, func(), error) {
 	panic(wire.Build(
 		di.ServerProviderSet,
+		di.HandlerProviderSet,
 		di.ServiceProviderSet,
 		newApp,
 	))
