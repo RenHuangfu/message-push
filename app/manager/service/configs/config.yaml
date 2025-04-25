@@ -8,15 +8,15 @@ server:
 data:
   database:
     driver: mysql
-    source: app_user:000@tcp(mysql:3306)/messagepush?parseTime=True&loc=Local
+    source: app_user:000@tcp(43.138.114.41:3306)/messagepush?parseTime=True&loc=Local
   redis:
-    addr: redis:6379
+    addr: 43.138.114.41:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
   kafka:
     brokers:
       - 43.138.114.41:9092
-    topic: demo
+    topic: one_topic
 client:
   user:
    endpoint: pusher:9001

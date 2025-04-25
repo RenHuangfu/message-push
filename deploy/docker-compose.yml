@@ -1,74 +1,12 @@
 version: '3'
 
 services:
-  # 基础设施服务
-  zookeeper:
-    image: zookeeper
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    networks:
-      - app-network
-    volumes:
-      - zookeeper_data:/data
-      - zookeeper_logs:/datalog
-
-  kafka:
-    image: wurstmeister/kafka
-    container_name: kafka
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_ADVERTISED_HOST_NAME: "kafka"  # 改为容器名称
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_LOG_DIRS: "/kafka/logs"
-    volumes:
-      - kafka_data:/kafka
-    depends_on:
-      - zookeeper
-    networks:
-      - app-network
-
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: "000"
-      MYSQL_DATABASE: "messagepush"
-      MYSQL_USER: "app_user"
-      MYSQL_PASSWORD: "000"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ../doc/messagepush.sql:/docker-entrypoint-initdb.d
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 10s
-      retries: 10
-
-  redis:
-    image: redis:7-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - app-network
-
   # 业务服务
   manager:
     image: manager-service:latest
     container_name: manager
-    environment:
-      KAFKA_BROKERS: "kafka:9092"
-    depends_on:
-      - kafka
+    ports:
+      - "9000:9000"
     networks:
       - app-network
 
@@ -77,30 +15,12 @@ services:
     container_name: receiver
     ports:
       - "8000:8000"
-    environment:
-      MYSQL_DSN: "app_user:userpass@tcp(mysql:3306)/app_db"
-      REDIS_ADDR: "redis:6379"
-      REDIS_PASS: "redispass"
-      KAFKA_BROKERS: "kafka:9092"
-    depends_on:
-      - mysql
-      - redis
-      - kafka
     networks:
       - app-network
 
   pusher:
     image: pusher-service:latest
     container_name: pusher
-    ports:
-      - "9001:9001"  # gRPC
-    environment:
-      MYSQL_DSN: "app_user:userpass@tcp(mysql:3306)/app_db"
-      REDIS_ADDR: "redis:6379"
-      REDIS_PASS: "redispass"
-    depends_on:
-      - mysql
-      - redis
     networks:
       - app-network
 
@@ -108,10 +28,3 @@ services:
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  zookeeper_data:
-  zookeeper_logs:
-  kafka_data:
-  mysql_data:
-  redis_data:
