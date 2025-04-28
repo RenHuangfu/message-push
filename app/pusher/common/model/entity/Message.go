@@ -1,5 +1,10 @@
 package entity
 
+import (
+	"github.com/gorilla/websocket"
+	"sync"
+)
+
 type ClientRequest struct {
 	AppId    string `json:"app_id"`
 	ClientId string `json:"client_id"`
@@ -15,4 +20,9 @@ type Message struct {
 	ClientIDs []int  `json:"client_ids"`
 	Content   string `json:"content"`
 	//SendTime  time.Time `json:"send_time"`
+}
+
+type Connect struct {
+	sync.Mutex
+	Conn *websocket.Conn
 }

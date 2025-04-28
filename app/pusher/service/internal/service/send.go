@@ -39,9 +39,14 @@ func (s *SendService) Consume(ctx context.Context, _ string, headers broker.Head
 				case <-t.C:
 					return
 				default:
-					if conn, ok := s.clientConn.Load(clientKey); ok {
-						if err := conn.(*websocket.Conn).WriteMessage(websocket.TextMessage, []byte(msg.Content)); err != nil {
-							s.log.Errorf("send message failed: %v", err)
+					if newConn, ok := s.clientConn.Load(clientKey); ok {
+						conn := newConn.(*entity.Connect)
+						conn.Lock()
+						err := conn.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Content))
+						conn.Unlock()
+						if err != nil {
+							s.log.Infof("send message failed: %v", err)
+							s.clientConn.CompareAndDelete(clientKey, newConn)
 						} else {
 							return
 						}
@@ -62,43 +67,47 @@ func (s *SendService) RegisterClient(req *entity.ClientRequest, conn *websocket.
 
 	if existing, ok := s.clientConn.Load(clientKey); ok {
 		s.log.Infof("关闭旧连接: %v", clientKey)
-		existing.(*websocket.Conn).Close()
-		s.clientConn.Delete(clientKey)
+		existingConn := existing.(*entity.Connect)
+		existingConn.Lock()
+		existingConn.Conn.Close()
+		existingConn.Unlock()
 	}
 
-	s.clientConn.Store(clientKey, conn)
+	newConn := &entity.Connect{
+		Conn: conn,
+	}
+	s.clientConn.Store(clientKey, newConn)
 
 	ctx := context.WithValue(context.Background(), "clientKey", clientKey)
 	cancelCtx, cancel := context.WithCancel(ctx)
 
-	go s.WriteLoop(ctx, cancel, conn)
-	go s.ReadLoop(cancelCtx, conn)
+	go s.WriteLoop(ctx, cancel, newConn)
+	go s.ReadLoop(cancelCtx, newConn)
 }
 
-func (s *SendService) ReadLoop(ctx context.Context, conn *websocket.Conn) {
-	defer conn.Close()
+func (s *SendService) ReadLoop(ctx context.Context, conn *entity.Connect) {
+	defer func() {
+		conn.Lock()
+		conn.Conn.Close()
+		conn.Unlock()
+	}()
 	for {
 		select {
 		case <-ctx.Done():
 			s.log.Infof("read loop exit")
 			return
 		default:
-			msgType, data, err := conn.ReadMessage()
+			msgType, data, err := conn.Conn.ReadMessage()
 			if err != nil {
 				s.log.Errorf("read message failed: %v", err)
 				return
 			}
 			s.log.Infof("received message: type=%d, data=%s", msgType, data)
-
-			if err := conn.WriteMessage(msgType, data); err != nil {
-				s.log.Errorf("write message failed: %v", err)
-				return
-			}
 		}
 	}
 }
 
-func (s *SendService) WriteLoop(ctx context.Context, cancel context.CancelFunc, conn *websocket.Conn) {
+func (s *SendService) WriteLoop(ctx context.Context, cancel context.CancelFunc, conn *entity.Connect) {
 	ticker := time.NewTicker(5 * time.Second)
 	defer func() {
 		ticker.Stop()
@@ -108,11 +117,14 @@ func (s *SendService) WriteLoop(ctx context.Context, cancel context.CancelFunc, 
 	for {
 		select {
 		case <-ticker.C:
-			if err := conn.WriteControl(
+			conn.Lock()
+			err := conn.Conn.WriteControl(
 				websocket.PingMessage,
 				[]byte("ping"),
 				time.Now().Add(5*time.Second),
-			); err != nil {
+			)
+			conn.Unlock()
+			if err != nil {
 				s.log.Errorf("心跳发送失败: %v", err)
 				cancel()
 				return
