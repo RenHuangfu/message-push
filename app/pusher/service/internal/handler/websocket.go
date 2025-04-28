@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/gorilla/websocket"
 	"message-push/app/pusher/common/model/entity"
@@ -33,20 +32,20 @@ func NewWebSocketHandler(logger log.Logger, service *service.SendService) *WebSo
 
 // ServeHTTP 处理 WebSocket 连接
 func (h *WebSocketHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	var cliReq entity.ClientRequest
-	err := json.NewDecoder(req.Body).Decode(&cliReq)
-	if err != nil {
-		h.log.Errorf("marshal failed: %v", err)
-		return
-	}
-
+	// 先完成WebSocket握手
 	conn, err := h.upgrader.Upgrade(w, req, nil)
 	if err != nil {
-		h.log.Errorf("upgrade failed: %v", err)
+		h.log.Errorf("WebSocket upgrade failed: %v", err)
 		return
 	}
 
-	h.log.Info("new websocket connection")
+	// 通过WebSocket连接读取认证信息
+	var cliReq entity.ClientRequest
+	if err := conn.ReadJSON(&cliReq); err != nil {
+		h.log.Errorf("Read auth failed: %v", err)
+		return
+	}
 
+	// 注册客户端
 	h.sendService.RegisterClient(&cliReq, conn)
 }

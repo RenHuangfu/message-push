@@ -2,12 +2,10 @@ package data
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-kratos/kratos/v2/log"
 	"message-push/app/receiver/common/model/entity"
 	"message-push/app/receiver/common/repo"
 	v1 "message-push/app/receiver/service/api/server/v1"
-	"message-push/client/test"
 )
 
 type MessageData struct {
@@ -46,7 +44,6 @@ func (md *MessageData) SaveMessageToDB(ctx context.Context, p *entity.SendMessag
 		md.log.WithContext(ctx).Infof("error %s", err)
 		return err
 	}
-	test.Test(fmt.Sprintf("receiver存数据到数据库：%v", p))
 	return nil
 }
 
@@ -62,6 +59,5 @@ func (md *MessageData) TriggerEvent(ctx context.Context, p *entity.SendMessagePa
 		md.log.WithContext(ctx).Infof("error: %s", err)
 		return err
 	}
-	test.Test(fmt.Sprintf("receiver触发事件：%v", p))
 	return nil
 }

@@ -1,10 +1,10 @@
 server:
   http:
-    addr: 0.0.0.0:8000
-    timeout: 1s
+    addr: 0.0.0.0:7999
+    timeout: 5s
   grpc:
     addr: 0.0.0.0:9001
-    timeout: 1s
+    timeout: 5s
 data:
   database:
     driver: mysql
@@ -17,3 +17,4 @@ data:
     brokers:
       - 43.138.114.41:9092
     topic: one_topic
+    group: two_group

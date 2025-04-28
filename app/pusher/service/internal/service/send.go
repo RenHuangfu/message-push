@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/tx7do/kratos-transport/broker"
 	"message-push/app/pusher/common/model/entity"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -21,22 +22,53 @@ func NewSendService(logger log.Logger) *SendService {
 	}
 }
 
-func (s *SendService) Consume(ctx context.Context, _ string, _ broker.Headers, _ *entity.Message) error {
+func (s *SendService) Consume(ctx context.Context, _ string, headers broker.Headers, msg *entity.Message) error {
+	s.log.Infof("Consume: %v", msg)
+	clientKeys := make([]entity.ClientKey, len(msg.ClientIDs))
+	for i, clientID := range msg.ClientIDs {
+		clientKeys[i] = entity.ClientKey{
+			AppId:    strconv.Itoa(msg.AppID),
+			ClientId: strconv.Itoa(clientID),
+		}
+	}
+	for _, clientKey := range clientKeys {
+		go func(clientKey entity.ClientKey) {
+			t := time.NewTimer(time.Hour * 24)
+			for {
+				select {
+				case <-t.C:
+					return
+				default:
+					if conn, ok := s.clientConn.Load(clientKey); ok {
+						if err := conn.(*websocket.Conn).WriteMessage(websocket.TextMessage, []byte(msg.Content)); err != nil {
+							s.log.Errorf("send message failed: %v", err)
+						} else {
+							return
+						}
+					}
+					time.Sleep(time.Second * 5)
+				}
+			}
+		}(clientKey)
+	}
 	return nil
 }
 
 func (s *SendService) RegisterClient(req *entity.ClientRequest, conn *websocket.Conn) {
-	s.clientConn.Store(entity.ClientKey{
+	clientKey := entity.ClientKey{
 		AppId:    req.AppId,
 		ClientId: req.ClientId,
-		Type:     req.Type,
-	}, conn)
+	}
 
-	ctx := context.WithValue(context.Background(), "clientKey", entity.ClientKey{
-		AppId:    req.AppId,
-		ClientId: req.ClientId,
-		Type:     req.Type,
-	})
+	if existing, ok := s.clientConn.Load(clientKey); ok {
+		s.log.Infof("关闭旧连接: %v", clientKey)
+		existing.(*websocket.Conn).Close()
+		s.clientConn.Delete(clientKey)
+	}
+
+	s.clientConn.Store(clientKey, conn)
+
+	ctx := context.WithValue(context.Background(), "clientKey", clientKey)
 	cancelCtx, cancel := context.WithCancel(ctx)
 
 	go s.WriteLoop(ctx, cancel, conn)
@@ -68,14 +100,20 @@ func (s *SendService) ReadLoop(ctx context.Context, conn *websocket.Conn) {
 
 func (s *SendService) WriteLoop(ctx context.Context, cancel context.CancelFunc, conn *websocket.Conn) {
 	ticker := time.NewTicker(5 * time.Second)
-	defer ticker.Stop()
+	defer func() {
+		ticker.Stop()
+		clientKey := ctx.Value("clientKey").(entity.ClientKey)
+		s.clientConn.CompareAndDelete(clientKey, conn)
+	}()
 	for {
 		select {
 		case <-ticker.C:
-			// 发送心跳消息
-			if err := conn.WriteMessage(websocket.TextMessage, []byte("heartbeat")); err != nil {
-				s.log.Errorf("send heartbeat failed: %v", err)
-				s.clientConn.Delete(ctx.Value("clientKey"))
+			if err := conn.WriteControl(
+				websocket.PingMessage,
+				[]byte("ping"),
+				time.Now().Add(5*time.Second),
+			); err != nil {
+				s.log.Errorf("心跳发送失败: %v", err)
 				cancel()
 				return
 			}

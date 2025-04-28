@@ -18,7 +18,7 @@ func NewKafkaServer(c *conf.Bootstrap, svc *service.SendService) *kafka.Server {
 	)
 
 	_ = kafka.RegisterSubscriber(srv, ctx,
-		c.Data.Kafka.Topic, "", false,
+		c.Data.Kafka.Topic, c.Data.Kafka.Group, false,
 		svc.Consume,
 	)
 

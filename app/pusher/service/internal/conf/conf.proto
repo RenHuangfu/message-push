@@ -48,4 +48,5 @@ message Redis {
 message Kafka {
   repeated string brokers = 1;
   string topic = 2;
+  string group = 3;
 }
