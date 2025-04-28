@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket 客户端</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .input-group { margin-bottom: 10px; }
+        label { display: inline-block; width: 100px; }
+        input { width: 300px; padding: 5px; }
+        button { padding: 5px 15px; margin-right: 10px; }
+        #messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            height: 300px;
+            overflow-y: auto;
+        }
+        .status { color: #666; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>WebSocket 客户端</h1>
+
+    <div class="input-group">
+        <label>服务器地址:</label>
+        <input type="text" id="server" value="ws://8.147.116.201:7999/ws">
+    </div>
+
+    <div class="input-group">
+        <label>App ID:</label>
+        <input type="text" id="app" value="1">
+    </div>
+
+    <div class="input-group">
+        <label>Client ID:</label>
+        <input type="text" id="client" value="1">
+    </div>
+
+    <button onclick="connect()">连接</button>
+    <button onclick="disconnect()" disabled id="disconnectBtn">断开</button>
+
+    <div class="status" id="status">未连接</div>
+
+    <div id="messages"></div>
+</div>
+
+<script src="ws.js"></script>
+</body>
+</html>
