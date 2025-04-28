@@ -6,7 +6,7 @@ services:
     image: manager-service:latest
     container_name: manager
     ports:
-      - "9000:9000"
+      - "8800:8800"
     networks:
       - app-network
 
@@ -21,6 +21,8 @@ services:
   pusher:
     image: pusher-service:latest
     container_name: pusher
+    ports:
+      - "7999:7999"
     networks:
       - app-network
 
