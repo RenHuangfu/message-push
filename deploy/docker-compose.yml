@@ -18,11 +18,39 @@ services:
     networks:
       - app-network
 
-  pusher:
+  pusher_0:
     image: pusher-service:latest
-    container_name: pusher
+    environment:
+      - NODE_NAME=pusher_0
+      - TOPIC=one_topic
+      - PORT=7999
+    container_name: pusher0
     ports:
       - "7999:7999"
+    networks:
+      - app-network
+
+  pusher_1:
+    image: pusher-service:latest
+    environment:
+      - NODE_NAME=pusher_1
+      - TOPIC=one_topic
+      - PORT=7998
+    container_name: pusher1
+    ports:
+      - "7998:7998"
+    networks:
+      - app-network
+
+  pusher_2:
+    image: pusher-service:latest
+    environment:
+      - NODE_NAME=pusher_2
+      - TOPIC=two_topic
+      - PORT=7997
+    container_name: pusher2
+    ports:
+      - "7997:7997"
     networks:
       - app-network
 

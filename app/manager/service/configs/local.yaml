@@ -19,4 +19,8 @@ data:
     topic:
       - one_topic
       - two_topic
-      - three_topic
+  zookeeper:
+    addr: 43.138.114.41:2181
+    senders_root: "/push_services/senders"
+    senders_name: "/push_services/pushers"
+    timeout: 5s

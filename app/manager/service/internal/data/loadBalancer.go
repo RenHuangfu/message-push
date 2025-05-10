@@ -19,11 +19,13 @@ import (
 )
 
 type LoadBalancer struct {
-	zk        *zk.Conn
-	producers []kafka.Producer
-	topics    []string
-	pushers   []*entity.Pusher
-	mu        sync.RWMutex
+	zk              *zk.Conn
+	producers       []kafka.Producer
+	topics          []string
+	sendersPath     string
+	sendersNamePath string
+	pushers         []*entity.Pusher
+	mu              sync.RWMutex
 }
 
 func NewLoadBalancer(c *conf.Bootstrap) repo.LoadBalancer {
@@ -46,17 +48,19 @@ func NewLoadBalancer(c *conf.Bootstrap) repo.LoadBalancer {
 	}
 
 	lb := &LoadBalancer{
-		zk:        conn,
-		producers: producers,
-		topics:    c.Data.Kafka.Topic,
-		pushers:   make([]*entity.Pusher, 0),
+		zk:              conn,
+		producers:       producers,
+		topics:          c.Data.Kafka.Topic,
+		sendersPath:     c.Data.Zookeeper.SendersRoot,
+		sendersNamePath: c.Data.Zookeeper.SendersName,
+		pushers:         make([]*entity.Pusher, 0),
 	}
 	go lb.watchNodes()
 	return lb
 }
 
 func (lb *LoadBalancer) SelectProducer(ctx context.Context, p *ent.Message) (kafka.Producer, error) {
-	index := p.AppID % 3
+	index := p.AppID % len(lb.topics)
 	if index < 0 {
 		index = -index
 	}
@@ -69,7 +73,12 @@ func (lb *LoadBalancer) SearchPusher(ctx context.Context, p *entity.SearchPusher
 		return "", err
 	}
 
-	hostPort, err := lb.selectNode(lb.topics[appId%3])
+	index := appId % len(lb.topics)
+	if index < 0 {
+		index = -index
+	}
+
+	hostPort, err := lb.selectNode(lb.topics[index])
 	if err != nil {
 		return "", err
 	}
@@ -133,7 +142,7 @@ func (lb *LoadBalancer) selectNode(topic string) (string, error) {
 
 func (lb *LoadBalancer) watchNodes() {
 	for {
-		children, _, eventCh, err := lb.zk.ChildrenW("/push_services/pushers")
+		children, _, eventCh, err := lb.zk.ChildrenW(lb.sendersNamePath)
 		if err != nil {
 			time.Sleep(1 * time.Second)
 			continue
@@ -158,7 +167,7 @@ func (lb *LoadBalancer) refreshNodes(children []string) {
 	newNodes := make([]*entity.Pusher, 0, len(children))
 
 	for _, child := range children {
-		path := fmt.Sprintf("/push_services/senders/%s", child)
+		path := fmt.Sprintf("%s/%s", lb.sendersPath, child)
 		data, _, err := lb.zk.Get(path)
 		if err != nil {
 			continue

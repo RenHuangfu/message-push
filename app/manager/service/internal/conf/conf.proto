@@ -53,6 +53,7 @@ message Kafka {
 
 message Zookeeper {
   string addr = 1;
-  string root = 2;
-  google.protobuf.Duration timeout = 3;
+  string senders_root = 2;
+  string senders_name = 3;
+  google.protobuf.Duration timeout = 4;
 }

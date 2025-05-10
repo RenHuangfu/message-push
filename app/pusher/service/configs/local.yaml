@@ -18,3 +18,14 @@ data:
       - 43.138.114.41:9092
     topic: one_topic
     group: two_group
+  zookeeper:
+    addr: 43.138.114.41:2181
+    senders_root: "/push_services/senders"
+    senders_name: "/push_services/pushers"
+    timeout: 5s
+report:
+  host: 127.0.0.1
+  port: 7999
+  topic: one_topic
+  weight: 5
+  nodePath: /push_services/pushers/one_node
