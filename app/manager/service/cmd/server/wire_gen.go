@@ -28,7 +28,8 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	if err != nil {
 		return nil, nil, err
 	}
-	triggerRepo := data.NewTriggerRepo(logger, dataData)
+	loadBalancer := data.NewLoadBalancer(bootstrap)
+	triggerRepo := data.NewTriggerRepo(logger, dataData, loadBalancer)
 	triggerUsecase := usecase.NewTriggerUsecase(logger, triggerRepo)
 	triggerService := service.NewTriggerService(logger, triggerUsecase)
 	grpcServer := server.NewGRPCServer(bootstrap, triggerService)

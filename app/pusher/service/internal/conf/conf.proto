@@ -8,6 +8,7 @@ import "google/protobuf/duration.proto";
 message Bootstrap {
   Server server = 1;
   Data data = 2;
+  Report report = 3;
 }
 
 message Server {
@@ -19,6 +20,7 @@ message Data {
   Database database = 1;
   Redis redis = 2;
   Kafka kafka = 3;
+  Zookeeper zookeeper = 4;
 }
 
 message HTTP {
@@ -49,4 +51,18 @@ message Kafka {
   repeated string brokers = 1;
   string topic = 2;
   string group = 3;
+}
+
+message Zookeeper {
+  string addr = 1;
+  string root = 2;
+  google.protobuf.Duration timeout = 3;
+}
+
+message Report {
+  string host = 1;
+  int32 port = 2;
+  string topic = 3;
+  int32 weight = 4;
+  string nodePath = 5;
 }

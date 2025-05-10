@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package server.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "server/api/server/v1;v1";
+service SearchPusher {
+  rpc PushSearch(PushSearchRequest) returns (PushSearchResponse) {
+    option (google.api.http) = {
+      post: "/search"
+      body: "*"
+    };
+  }
+}
+
+message PushSearchRequest {
+  string app_id = 1;
+  string client_id = 2;
+}
+
+message PushSearchResponse {
+  string url = 1;
+}

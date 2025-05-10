@@ -14,11 +14,13 @@ import (
 type SendService struct {
 	log        *log.Helper
 	clientConn sync.Map
+	report     *Report
 }
 
-func NewSendService(logger log.Logger) *SendService {
+func NewSendService(report *Report, logger log.Logger) *SendService {
 	return &SendService{
-		log: log.NewHelper(logger),
+		log:    log.NewHelper(logger),
+		report: report,
 	}
 }
 

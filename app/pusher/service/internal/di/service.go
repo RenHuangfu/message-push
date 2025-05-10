@@ -18,5 +18,7 @@ var (
 	)
 
 	ServiceProviderSet = wire.NewSet(
-		service.NewSendService)
+		service.NewSendService,
+		service.NewReport,
+	)
 )

@@ -10,14 +10,16 @@ import (
 )
 
 type Trigger struct {
-	log  *log.Helper
-	data *Data
+	log          *log.Helper
+	data         *Data
+	loadBalancer repo.LoadBalancer
 }
 
-func NewTriggerRepo(logger log.Logger, data *Data) repo.TriggerRepo {
+func NewTriggerRepo(logger log.Logger, data *Data, balancer repo.LoadBalancer) repo.TriggerRepo {
 	return &Trigger{
-		log:  log.NewHelper(logger),
-		data: data,
+		log:          log.NewHelper(logger),
+		data:         data,
+		loadBalancer: balancer,
 	}
 }
 
@@ -43,11 +45,19 @@ func (t *Trigger) ProcessMessage(ctx context.Context, param *entity.TriggerParam
 			t.log.WithContext(ctx).Infof("error: %s", err)
 			return err
 		}
-		err = t.data.producer.SendMessage(msgData)
+
+		producer, err := t.loadBalancer.SelectProducer(ctx, v)
 		if err != nil {
 			t.log.WithContext(ctx).Infof("error: %s", err)
 			return err
 		}
+
+		err = producer.SendMessage(msgData)
+		if err != nil {
+			t.log.WithContext(ctx).Infof("error: %s", err)
+			return err
+		}
+
 		err = t.data.db.Message.
 			Update().
 			Where(

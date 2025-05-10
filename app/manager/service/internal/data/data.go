@@ -1,7 +1,6 @@
 package data
 
 import (
-	"github.com/RenHuangfu/tools/kafka"
 	"github.com/RenHuangfu/tools/redis"
 	"github.com/go-kratos/kratos/v2/log"
 	_ "github.com/go-sql-driver/mysql"
@@ -10,10 +9,9 @@ import (
 )
 
 type Data struct {
-	c        *conf.Bootstrap
-	db       *ent.Client
-	redis    *redis.Client
-	producer kafka.Producer
+	c     *conf.Bootstrap
+	db    *ent.Client
+	redis *redis.Client
 }
 
 func NewData(c *conf.Bootstrap, logger log.Logger) (*Data, func(), error) {
@@ -30,19 +28,9 @@ func NewData(c *conf.Bootstrap, logger log.Logger) (*Data, func(), error) {
 		Addr: c.Data.Redis.Addr,
 	})
 
-	producer := kafka.NewKafkaProducer(
-		kafka.WithBrokers(c.Data.Kafka.Brokers),
-		kafka.WithTopic(c.Data.Kafka.Topic),
-		kafka.WithAck(0),
-		kafka.WithAsync())
-	if producer == nil {
-		panic("nil producer")
-	}
-
 	return &Data{
-		c:        c,
-		db:       entClient,
-		redis:    rdb,
-		producer: producer,
+		c:     c,
+		db:    entClient,
+		redis: rdb,
 	}, cleanup, nil
 }

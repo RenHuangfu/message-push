@@ -23,7 +23,8 @@ import (
 
 // wireApp init kratos application.
 func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
-	sendService := service.NewSendService(logger)
+	report := service.NewReport(bootstrap)
+	sendService := service.NewSendService(report, logger)
 	webSocketHandler := handler.NewWebSocketHandler(logger, sendService)
 	httpServer := server.NewHTTPServer(bootstrap, webSocketHandler)
 	kafkaServer := server.NewKafkaServer(bootstrap, sendService)

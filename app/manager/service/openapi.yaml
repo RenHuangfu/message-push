@@ -3,8 +3,40 @@
 
 openapi: 3.0.3
 info:
-    title: ""
+    title: SearchPusher API
     version: 0.0.1
-paths: {}
+paths:
+    /search:
+        post:
+            tags:
+                - SearchPusher
+            operationId: SearchPusher_PushSearch
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/server.v1.PushSearchRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/server.v1.PushSearchResponse'
 components:
-    schemas: {}
+    schemas:
+        server.v1.PushSearchRequest:
+            type: object
+            properties:
+                appId:
+                    type: string
+                clientId:
+                    type: string
+        server.v1.PushSearchResponse:
+            type: object
+            properties:
+                url:
+                    type: string
+tags:
+    - name: SearchPusher

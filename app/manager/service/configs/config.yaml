@@ -16,4 +16,7 @@ data:
   kafka:
     brokers:
       - 43.138.114.41:9092
-    topic: one_topic
+    topic:
+      - one_topic
+      - two_topic
+      - three_topic
