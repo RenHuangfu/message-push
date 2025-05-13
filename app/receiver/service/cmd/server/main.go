@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/go-kratos/kratos/v2/config/env"
 	"message-push/app/receiver/service/internal/conf"
 	"os"
 
@@ -58,6 +59,7 @@ func main() {
 	c := config.New(
 		config.WithSource(
 			file.NewSource(flagconf),
+			env.NewSource("THIRD_COMPONENT"),
 		),
 	)
 	defer c.Close()
