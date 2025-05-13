@@ -8,9 +8,9 @@ server:
 data:
   database:
     driver: mysql
-    source: root:000@tcp(43.138.114.41:3306)/messagepush?parseTime=True&loc=Local
+    source: root:000@tcp(${THIRD_COMPONENT}:3306)/messagepush?parseTime=True&loc=Local
   redis:
-    addr: 43.138.114.41:6379
+    addr: ${THIRD_COMPONENT}:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
   grpc:

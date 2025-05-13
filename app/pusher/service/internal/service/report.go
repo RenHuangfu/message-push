@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/samuel/go-zookeeper/zk"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"message-push/app/pusher/common/model/entity"
@@ -13,22 +14,25 @@ import (
 )
 
 type Report struct {
-	zk *zk.Conn
+	log *log.Helper
+	zk  *zk.Conn
 }
 
-func NewReport(c *conf.Bootstrap) *Report {
+func NewReport(c *conf.Bootstrap, logger log.Logger) *Report {
 	conn, _, err := zk.Connect([]string{c.Data.Zookeeper.Addr}, c.Data.Zookeeper.Timeout.AsDuration())
 	if err != nil {
 		panic(err)
 	}
 	r := &Report{
-		zk: conn,
+		zk:  conn,
+		log: log.NewHelper(logger),
 	}
 	go r.StartStatusReporter(c)
 	return r
 }
 
 func (r *Report) StartStatusReporter(c *conf.Bootstrap) {
+	r.log.Infof("StartStatusReporter")
 	ticker := time.NewTicker(3 * time.Second)
 	for {
 		select {
