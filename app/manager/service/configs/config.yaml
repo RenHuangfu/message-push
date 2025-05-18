@@ -19,7 +19,6 @@ data:
     topic:
       - one_topic
       - two_topic
-      - three_topic
   zookeeper:
     addr: "${THIRD_COMPONENT:localhost}:2181"
     senders_root: "/push_services/senders"

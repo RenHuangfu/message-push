@@ -5,7 +5,7 @@ services:
   manager:
     image: manager-service:latest
     environment:
-      - THIRD_COMPONENT=43.138.114.41
+      - THIRD_COMPONENT=152.136.232.191
     container_name: manager
     ports:
       - "8800:8800"
@@ -15,7 +15,7 @@ services:
   receiver:
     image: receiver-service:latest
     environment:
-      - THIRD_COMPONENT=43.138.114.41
+      - THIRD_COMPONENT=152.136.232.191
     container_name: receiver
     ports:
       - "8000:8000"
@@ -28,7 +28,7 @@ services:
       - NODE_NAME=pusher_0
       - TOPIC=one_topic
       - PORT=7999
-      - THIRD_COMPONENT=43.138.114.41
+      - THIRD_COMPONENT=152.136.232.191
     container_name: pusher0
     ports:
       - "7999:7999"
@@ -41,7 +41,7 @@ services:
       - NODE_NAME=pusher_1
       - TOPIC=one_topic
       - PORT=7998
-      - THIRD_COMPONENT=43.138.114.41
+      - THIRD_COMPONENT=152.136.232.191
     container_name: pusher1
     ports:
       - "7998:7998"
@@ -54,7 +54,7 @@ services:
       - NODE_NAME=pusher_2
       - TOPIC=two_topic
       - PORT=7997
-      - THIRD_COMPONENT=43.138.114.41
+      - THIRD_COMPONENT=152.136.232.191
     container_name: pusher2
     ports:
       - "7997:7997"
