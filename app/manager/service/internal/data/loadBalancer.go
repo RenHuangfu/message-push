@@ -93,7 +93,7 @@ func (lb *LoadBalancer) selectNode(topic string) (string, error) {
 	// 过滤不可用节点
 	validNodes := make([]*entity.Pusher, 0)
 	for _, node := range lb.pushers {
-		if time.Since(node.LastUpdate) > 10*time.Second {
+		if time.Since(node.LastUpdate) > 30*time.Minute {
 			continue // 剔除超时节点
 		}
 		if node.CPULoad > 0.8 {
@@ -184,6 +184,7 @@ func (lb *LoadBalancer) refreshNodes(children []string) {
 			Weight:      nodeData.Weight,
 			Connections: nodeData.Connections,
 			CPULoad:     nodeData.CPULoad,
+			Topic:       nodeData.Topic,
 			LastUpdate:  time.Unix(nodeData.UpdatedAt, 0),
 		}
 		newNodes = append(newNodes, newNode)

@@ -1,7 +1,6 @@
 package data
 
 import (
-	"github.com/RenHuangfu/tools/redis"
 	"github.com/go-kratos/kratos/v2/log"
 	_ "github.com/go-sql-driver/mysql"
 	"message-push/app/manager/common/model/po/ent"
@@ -9,9 +8,8 @@ import (
 )
 
 type Data struct {
-	c     *conf.Bootstrap
-	db    *ent.Client
-	redis *redis.Client
+	c  *conf.Bootstrap
+	db *ent.Client
 }
 
 func NewData(c *conf.Bootstrap, logger log.Logger) (*Data, func(), error) {
@@ -24,13 +22,8 @@ func NewData(c *conf.Bootstrap, logger log.Logger) (*Data, func(), error) {
 		return nil, nil, err
 	}
 
-	rdb := redis.MustNew(&redis.Option{
-		Addr: c.Data.Redis.Addr,
-	})
-
 	return &Data{
-		c:     c,
-		db:    entClient,
-		redis: rdb,
+		c:  c,
+		db: entClient,
 	}, cleanup, nil
 }

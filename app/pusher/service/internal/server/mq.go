@@ -5,6 +5,7 @@ import (
 	"github.com/tx7do/kratos-transport/transport/kafka"
 	"message-push/app/pusher/service/internal/conf"
 	"message-push/app/pusher/service/internal/service"
+	"os"
 )
 
 func NewKafkaServer(c *conf.Bootstrap, svc *service.SendService) *kafka.Server {
@@ -18,7 +19,7 @@ func NewKafkaServer(c *conf.Bootstrap, svc *service.SendService) *kafka.Server {
 	)
 
 	_ = kafka.RegisterSubscriber(srv, ctx,
-		c.Data.Kafka.Topic, c.Data.Kafka.Group, false,
+		os.Getenv("TOPIC"), c.Data.Kafka.Group, false,
 		svc.Consume,
 	)
 

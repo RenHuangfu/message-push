@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/go-kratos/kratos/v2/config/env"
+	"github.com/go-kratos/kratos/v2/transport/http"
 	"message-push/app/manager/service/internal/conf"
 	"os"
 
@@ -17,6 +17,7 @@ import (
 
 // go build -ldflags "-X main.Version=x.y.z"
 var (
+
 	// Name is the name of the compiled software.
 	Name string
 	// Version is the version of the compiled software.
@@ -31,7 +32,7 @@ func init() {
 	flag.StringVar(&flagconf, "conf", "../../configs", "config path, eg: -conf config.yaml")
 }
 
-func newApp(logger log.Logger, grpc *grpc.Server) *kratos.App {
+func newApp(logger log.Logger, grpc *grpc.Server, http *http.Server) *kratos.App {
 	return kratos.New(
 		kratos.ID(id),
 		kratos.Name(Name),
@@ -40,6 +41,7 @@ func newApp(logger log.Logger, grpc *grpc.Server) *kratos.App {
 		kratos.Logger(logger),
 		kratos.Server(
 			grpc,
+			http,
 		),
 	)
 }
@@ -58,7 +60,6 @@ func main() {
 	c := config.New(
 		config.WithSource(
 			file.NewSource(flagconf),
-			env.NewSource("THIRD_COMPONENT"),
 		),
 	)
 	defer c.Close()

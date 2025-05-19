@@ -4,18 +4,15 @@ services:
   # 业务服务
   manager:
     image: manager-service:latest
-    environment:
-      - THIRD_COMPONENT=152.136.232.191
     container_name: manager
     ports:
+      - "8008:8008"
       - "8800:8800"
     networks:
       - app-network
 
   receiver:
     image: receiver-service:latest
-    environment:
-      - THIRD_COMPONENT=152.136.232.191
     container_name: receiver
     ports:
       - "8000:8000"
@@ -25,10 +22,9 @@ services:
   pusher_0:
     image: pusher-service:latest
     environment:
-      - NODE_NAME=pusher_0
+      - NODE_PATH=/push_services/pushers/pusher_0
       - TOPIC=one_topic
       - PORT=7999
-      - THIRD_COMPONENT=152.136.232.191
     container_name: pusher0
     ports:
       - "7999:7999"
@@ -38,10 +34,9 @@ services:
   pusher_1:
     image: pusher-service:latest
     environment:
-      - NODE_NAME=pusher_1
-      - TOPIC=one_topic
+      - NODE_PATH=/push_services/pushers/pusher_1
+      - TOPIC=two_topic
       - PORT=7998
-      - THIRD_COMPONENT=152.136.232.191
     container_name: pusher1
     ports:
       - "7998:7998"
@@ -51,10 +46,9 @@ services:
   pusher_2:
     image: pusher-service:latest
     environment:
-      - NODE_NAME=pusher_2
+      - NODE_PATH=/push_services/pushers/pusher_2
       - TOPIC=two_topic
       - PORT=7997
-      - THIRD_COMPONENT=152.136.232.191
     container_name: pusher2
     ports:
       - "7997:7997"

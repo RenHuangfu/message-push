@@ -21,7 +21,7 @@ func NewSearchPusherService(logger log.Logger, uc *usecase.SearchPusherUsecase) 
 	}
 }
 
-func (s *SearchPusherService) SearchPusher(ctx context.Context, req *v1.PushSearchRequest) (*v1.PushSearchResponse, error) {
+func (s *SearchPusherService) PushSearch(ctx context.Context, req *v1.PushSearchRequest) (*v1.PushSearchResponse, error) {
 	s.log.Infof("search pusher, app_id: %s, client_id: %s", req.AppId, req.ClientId)
 	result, err := s.uc.SearchPusher(ctx, &entity.SearchPusherParam{
 		AppId:    req.AppId,

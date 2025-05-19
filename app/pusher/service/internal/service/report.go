@@ -7,6 +7,7 @@ import (
 	"github.com/shirou/gopsutil/v3/cpu"
 	"message-push/app/pusher/common/model/entity"
 	"message-push/app/pusher/service/internal/conf"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -37,10 +38,11 @@ func (r *Report) StartStatusReporter(c *conf.Bootstrap) {
 	for {
 		select {
 		case <-ticker.C:
+			port, _ := strconv.Atoi(os.Getenv("PORT"))
 			data := &entity.PusherJson{
 				Host:        c.Report.Host,
-				Port:        int(c.Report.Port),
-				Topic:       c.Report.Topic,
+				Port:        port,
+				Topic:       os.Getenv("TOPIC"),
 				Weight:      int(c.Report.Weight),
 				Connections: getConnectionCount(),
 				CPULoad:     getCPULoad(),
@@ -49,8 +51,8 @@ func (r *Report) StartStatusReporter(c *conf.Bootstrap) {
 			jsonData, _ := json.Marshal(data)
 
 			// 原子更新Zookeeper节点数据
-			_, stat, _ := r.zk.Get(c.Report.NodePath)
-			_, _ = r.zk.Set(c.Report.NodePath, jsonData, stat.Version)
+			_, stat, _ := r.zk.Get(os.Getenv("NODE_PATH"))
+			_, _ = r.zk.Set(os.Getenv("NODE_PATH"), jsonData, stat.Version)
 		}
 	}
 }

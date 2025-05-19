@@ -33,7 +33,10 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	triggerUsecase := usecase.NewTriggerUsecase(logger, triggerRepo)
 	triggerService := service.NewTriggerService(logger, triggerUsecase)
 	grpcServer := server.NewGRPCServer(bootstrap, triggerService)
-	app := newApp(logger, grpcServer)
+	searchPusherUsecase := usecase.NewSearchPusherUsecase(loadBalancer, logger)
+	searchPusherService := service.NewSearchPusherService(logger, searchPusherUsecase)
+	httpServer := server.NewHTTPServer(bootstrap, searchPusherService)
+	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()
 	}, nil

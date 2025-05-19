@@ -1,6 +1,6 @@
 server:
   http:
-    addr: 0.0.0.0:8000
+    addr: 0.0.0.0:8008
     timeout: 1s
   grpc:
     addr: 0.0.0.0:8800
@@ -8,19 +8,15 @@ server:
 data:
   database:
     driver: mysql
-    source: "root:000@tcp(${THIRD_COMPONENT:localhost}:3306)/messagepush?parseTime=True&loc=Local"
-  redis:
-    addr: "${THIRD_COMPONENT:localhost}:6379"
-    read_timeout: 0.2s
-    write_timeout: 0.2s
+    source: "root:000@tcp(8.152.156.127:3306)/messagepush?parseTime=True&loc=Local"
   kafka:
     brokers:
-      - "${THIRD_COMPONENT:localhost}:9092"
+      - 8.152.156.127:9092
     topic:
       - one_topic
       - two_topic
   zookeeper:
-    addr: "${THIRD_COMPONENT:localhost}:2181"
-    senders_root: "/push_services/senders"
+    addr: 8.152.156.127:2181
+    senders_root: "/push_services/pushers"
     senders_name: "/push_services/pushers"
     timeout: 5s

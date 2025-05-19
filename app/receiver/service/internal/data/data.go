@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"github.com/RenHuangfu/tools/redis"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
@@ -15,10 +14,9 @@ import (
 )
 
 type Data struct {
-	c     *conf.Bootstrap
-	db    *ent.Client
-	redis *redis.Client
-	grpc  v1.TriggerEventClient
+	c    *conf.Bootstrap
+	db   *ent.Client
+	grpc v1.TriggerEventClient
 }
 
 func NewData(c *conf.Bootstrap, logger log.Logger) (*Data, func(), error) {
@@ -30,10 +28,6 @@ func NewData(c *conf.Bootstrap, logger log.Logger) (*Data, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-
-	rdb := redis.MustNew(&redis.Option{
-		Addr: c.Data.Redis.Addr,
-	})
 
 	conn, err := grpc.DialInsecure(
 		context.Background(),
@@ -50,9 +44,8 @@ func NewData(c *conf.Bootstrap, logger log.Logger) (*Data, func(), error) {
 	}
 
 	return &Data{
-		c:     c,
-		db:    entClient,
-		redis: rdb,
-		grpc:  v1.NewTriggerEventClient(conn),
+		c:    c,
+		grpc: v1.NewTriggerEventClient(conn),
+		db:   entClient,
 	}, cleanup, nil
 }
