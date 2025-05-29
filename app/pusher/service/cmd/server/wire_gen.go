@@ -28,7 +28,8 @@ func wireApp(bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(),
 	webSocketHandler := handler.NewWebSocketHandler(logger, sendService)
 	httpServer := server.NewHTTPServer(bootstrap, webSocketHandler)
 	kafkaServer := server.NewKafkaServer(bootstrap, sendService)
-	app := newApp(logger, httpServer, kafkaServer)
+	grpcServer := server.NewGRPCServer(bootstrap, sendService)
+	app := newApp(logger, httpServer, kafkaServer, grpcServer)
 	return app, func() {
 	}, nil
 }

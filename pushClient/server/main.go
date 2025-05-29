@@ -30,7 +30,7 @@ type PageData struct {
 	Messages []string // 消息将通过 SSE 流式传输
 }
 
-const thirdPartyAPI = "http://172.24.115.53:8008/search" // 第三方 API 地址
+const thirdPartyAPI = "http://8.147.117.133:8008/search" // 第三方 API 地址
 
 func init() {
 	logger = log.New(os.Stdout, "[Server] ", log.LstdFlags)
