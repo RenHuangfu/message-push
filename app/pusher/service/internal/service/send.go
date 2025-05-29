@@ -6,12 +6,14 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/tx7do/kratos-transport/broker"
 	"message-push/app/pusher/common/model/entity"
+	v1 "message-push/app/pusher/service/api/server/v1"
 	"strconv"
 	"sync"
 	"time"
 )
 
 type SendService struct {
+	v1.DirectSendServiceServer
 	log        *log.Helper
 	clientConn sync.Map
 	report     *Report
@@ -59,6 +61,42 @@ func (s *SendService) Consume(ctx context.Context, _ string, headers broker.Head
 		}(clientKey)
 	}
 	return nil
+}
+
+func (s *SendService) DirectSend(ctx context.Context, msg *v1.DirectSendRequest) (*v1.DirectSendResponse, error) {
+	clientKeys := make([]entity.ClientKey, len(msg.ClientId))
+	for i, clientID := range msg.ClientId {
+		clientKeys[i] = entity.ClientKey{
+			AppId:    strconv.Itoa(int(msg.AppId)),
+			ClientId: strconv.Itoa(int(clientID)),
+		}
+	}
+	for _, clientKey := range clientKeys {
+		go func(clientKey entity.ClientKey) {
+			t := time.NewTimer(time.Hour * 24)
+			for {
+				select {
+				case <-t.C:
+					return
+				default:
+					if newConn, ok := s.clientConn.Load(clientKey); ok {
+						conn := newConn.(*entity.Connect)
+						conn.Lock()
+						err := conn.Conn.WriteMessage(websocket.TextMessage, []byte(msg.Content))
+						conn.Unlock()
+						if err != nil {
+							s.log.Infof("send message failed: %v", err)
+							s.clientConn.CompareAndDelete(clientKey, newConn)
+						} else {
+							return
+						}
+					}
+					time.Sleep(time.Second * 5)
+				}
+			}
+		}(clientKey)
+	}
+	return &v1.DirectSendResponse{}, nil
 }
 
 func (s *SendService) RegisterClient(req *entity.ClientRequest, conn *websocket.Conn) {

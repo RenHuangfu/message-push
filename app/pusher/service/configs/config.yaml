@@ -2,26 +2,29 @@ server:
   http:
     addr: 0.0.0.0:0000
     timeout: 5s
+  grpc:
+    addr: 0.0.0.0:0000
+    timeout: 5s
 data:
   database:
     driver: mysql
-    source: "root:000@tcp(8.152.156.127:3306)/messagepush?parseTime=True&loc=Local"
+    source: "root:000@tcp(60.205.244.34:3306)/messagepush?parseTime=True&loc=Local"
   redis:
-    addr: 8.152.156.127:6379
+    addr: 60.205.244.34:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
   kafka:
     brokers:
-      - 8.152.156.127:9092
+      - 60.205.244.34:9092
     topic: TOPIC
-    group: two_group
+    group: GROUP
   zookeeper:
-    addr: 8.152.156.127:2181
+    addr: 60.205.244.34:2181
     senders_root: "/push_services/senders"
     senders_name: "/push_services/pushers"
     timeout: 5s
 report:
-  host: 39.107.58.199
+  host: 8.147.117.133
   port: 0000
   topic: TOPIC
   weight: 5

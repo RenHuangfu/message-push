@@ -6,6 +6,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"message-push/app/manager/common/model/entity"
 	"message-push/app/manager/common/repo"
+	v1 "message-push/app/manager/service/api/server/v1"
 	"message-push/app/receiver/common/model/po/ent/message"
 )
 
@@ -39,6 +40,16 @@ func (t *Trigger) ProcessMessage(ctx context.Context, param *entity.TriggerParam
 		return err
 	}
 	for _, v := range res {
+		clientIds := make([]int32, len(v.ClientIds))
+		for i, v := range v.ClientIds {
+			clientIds[i] = int32(v)
+		}
+		_, _ = t.data.grpc.DirectSend(ctx, &v1.DirectSendRequest{
+			AppId:    int32(v.AppID),
+			ClientId: clientIds,
+			Content:  v.Content,
+		})
+
 		t.log.Infof("message: %v", v)
 		msgData, err := json.Marshal(v)
 		if err != nil {

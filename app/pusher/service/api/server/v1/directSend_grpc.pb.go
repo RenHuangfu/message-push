@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.12.4
-// source: server/v1/message.proto
+// source: server/v1/directSend.proto
 
 package v1
 
@@ -17,108 +17,6 @@ import (
 // is compatible with the grpc package it is being compiled against.
 // Requires gRPC-Go v1.64.0 or later.
 const _ = grpc.SupportPackageIsVersion9
-
-const (
-	TriggerEvent_ProcessMessage_FullMethodName = "/server.v1.TriggerEvent/ProcessMessage"
-)
-
-// TriggerEventClient is the client API for TriggerEvent service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type TriggerEventClient interface {
-	ProcessMessage(ctx context.Context, in *ProcessMessageRequest, opts ...grpc.CallOption) (*ProcessMessageResponse, error)
-}
-
-type triggerEventClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewTriggerEventClient(cc grpc.ClientConnInterface) TriggerEventClient {
-	return &triggerEventClient{cc}
-}
-
-func (c *triggerEventClient) ProcessMessage(ctx context.Context, in *ProcessMessageRequest, opts ...grpc.CallOption) (*ProcessMessageResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ProcessMessageResponse)
-	err := c.cc.Invoke(ctx, TriggerEvent_ProcessMessage_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// TriggerEventServer is the server API for TriggerEvent service.
-// All implementations must embed UnimplementedTriggerEventServer
-// for forward compatibility.
-type TriggerEventServer interface {
-	ProcessMessage(context.Context, *ProcessMessageRequest) (*ProcessMessageResponse, error)
-	mustEmbedUnimplementedTriggerEventServer()
-}
-
-// UnimplementedTriggerEventServer must be embedded to have
-// forward compatible implementations.
-//
-// NOTE: this should be embedded by value instead of pointer to avoid a nil
-// pointer dereference when methods are called.
-type UnimplementedTriggerEventServer struct{}
-
-func (UnimplementedTriggerEventServer) ProcessMessage(context.Context, *ProcessMessageRequest) (*ProcessMessageResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ProcessMessage not implemented")
-}
-func (UnimplementedTriggerEventServer) mustEmbedUnimplementedTriggerEventServer() {}
-func (UnimplementedTriggerEventServer) testEmbeddedByValue()                      {}
-
-// UnsafeTriggerEventServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to TriggerEventServer will
-// result in compilation errors.
-type UnsafeTriggerEventServer interface {
-	mustEmbedUnimplementedTriggerEventServer()
-}
-
-func RegisterTriggerEventServer(s grpc.ServiceRegistrar, srv TriggerEventServer) {
-	// If the following call pancis, it indicates UnimplementedTriggerEventServer was
-	// embedded by pointer and is nil.  This will cause panics if an
-	// unimplemented method is ever invoked, so we test this at initialization
-	// time to prevent it from happening at runtime later due to I/O.
-	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
-		t.testEmbeddedByValue()
-	}
-	s.RegisterService(&TriggerEvent_ServiceDesc, srv)
-}
-
-func _TriggerEvent_ProcessMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ProcessMessageRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TriggerEventServer).ProcessMessage(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: TriggerEvent_ProcessMessage_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TriggerEventServer).ProcessMessage(ctx, req.(*ProcessMessageRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// TriggerEvent_ServiceDesc is the grpc.ServiceDesc for TriggerEvent service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var TriggerEvent_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "server.v1.TriggerEvent",
-	HandlerType: (*TriggerEventServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "ProcessMessage",
-			Handler:    _TriggerEvent_ProcessMessage_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "server/v1/message.proto",
-}
 
 const (
 	DirectSendService_DirectSend_FullMethodName = "/server.v1.DirectSendService/DirectSend"
@@ -219,5 +117,5 @@ var DirectSendService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "server/v1/message.proto",
+	Metadata: "server/v1/directSend.proto",
 }

@@ -8,7 +8,7 @@ server:
 data:
   database:
     driver: mysql
-    source: "root:000@tcp(8.152.156.127:3306)/messagepush?parseTime=True&loc=Local"
+    source: "root:000@tcp(60.205.244.34:3306)/messagepush?parseTime=True&loc=Local"
   grpc:
     endpoint: manager:8800
     timeout: 1000

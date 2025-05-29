@@ -1,0 +1,22 @@
+body { font-family: Arial, sans-serif; padding: 20px; }
+.container { max-width: 600px; margin: 0 auto; }
+.input-group { margin-bottom: 10px; }
+label { display: inline-block; width: 100px; }
+input { width: 300px; padding: 5px; }
+button { padding: 5px 15px; margin-right: 10px; }
+#messages {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 20px;
+    height: 300px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+}
+.message-entry {
+    padding: 3px 0;
+    border-bottom: 1px solid #eee;
+}
+.message-entry:last-child {
+    border-bottom: none;
+}
+.status { color: #666; margin-top: 10px; font-weight: bold; }

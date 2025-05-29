@@ -4,6 +4,7 @@
     <option name="excludedPackages">
       <array>
         <option value="github.com/gorilla/websocket" />
+        <option value="message-push/app/manager/service/api/server/v1 作为 v1" />
       </array>
     </option>
   </component>

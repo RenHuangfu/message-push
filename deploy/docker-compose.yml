@@ -19,39 +19,45 @@ services:
     networks:
       - app-network
 
-  pusher_0:
+  pusher0:
     image: pusher-service:latest
     environment:
       - NODE_PATH=/push_services/pushers/pusher_0
       - TOPIC=one_topic
       - PORT=7999
+      - GRPC_PORT=7099
     container_name: pusher0
     ports:
       - "7999:7999"
+      - "7099:7099"
     networks:
       - app-network
 
-  pusher_1:
+  pusher1:
     image: pusher-service:latest
     environment:
       - NODE_PATH=/push_services/pushers/pusher_1
       - TOPIC=two_topic
       - PORT=7998
+      - GRPC_PORT=7098
     container_name: pusher1
     ports:
       - "7998:7998"
+      - "7098:7098"
     networks:
       - app-network
 
-  pusher_2:
+  pusher2:
     image: pusher-service:latest
     environment:
       - NODE_PATH=/push_services/pushers/pusher_2
       - TOPIC=two_topic
       - PORT=7997
+      - GRPC_PORT=7097
     container_name: pusher2
     ports:
       - "7997:7997"
+      - "7097:7097"
     networks:
       - app-network
 

@@ -20,6 +20,7 @@ message Data {
   Redis redis = 2;
   Kafka kafka = 3;
   Zookeeper zookeeper = 4;
+  GRPC_CLIENT grpc = 5;
 }
 
 message HTTP {
@@ -56,4 +57,9 @@ message Zookeeper {
   string senders_root = 2;
   string senders_name = 3;
   google.protobuf.Duration timeout = 4;
+}
+
+message GRPC_CLIENT {
+  string endpoint = 1;  // 服务发现地址（如：discovery:///user.service）
+  int64 timeout = 2;
 }

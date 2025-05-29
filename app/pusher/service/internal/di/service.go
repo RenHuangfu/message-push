@@ -11,6 +11,7 @@ var (
 	ServerProviderSet = wire.NewSet(
 		server.NewKafkaServer,
 		server.NewHTTPServer,
+		server.NewGRPCServer,
 	)
 
 	HandlerProviderSet = wire.NewSet(
