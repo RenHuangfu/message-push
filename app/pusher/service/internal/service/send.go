@@ -64,6 +64,7 @@ func (s *SendService) Consume(ctx context.Context, _ string, headers broker.Head
 }
 
 func (s *SendService) DirectSend(ctx context.Context, msg *v1.DirectSendRequest) (*v1.DirectSendResponse, error) {
+	s.log.Infof("DirectSend: %v", msg)
 	clientKeys := make([]entity.ClientKey, len(msg.ClientId))
 	for i, clientID := range msg.ClientId {
 		clientKeys[i] = entity.ClientKey{
